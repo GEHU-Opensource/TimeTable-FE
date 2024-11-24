@@ -77,6 +77,21 @@ searchInput.addEventListener("focus", function () {
     dropdownContent.style.display = "block";
 });
 
+function getFormElementNames() {
+    const elements = form.elements;
+    const elementDetails = [];
+    for(let i=0; i<elements.length; i++) {
+        const element = elements[i];
+        if(element.name) {
+            elementDetails.push({
+                name: element.name || "No Name",
+                value: element.value || ""
+            });
+        }
+    }
+    return elementDetails;
+}
+
 form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -86,14 +101,14 @@ form.addEventListener("submit", (e) => {
         return;
     }
 
-    const formData = new FormData(form);
+    const elements = getFormElementNames();
     const data = {
-        name: formData.get("name").toUpperCase(),
-        phone: formData.get("number"),
-        email: formData.get("email"),
-        department: formData.get("department"),
-        designation: formData.get("designation"),
-        working_days: formData.get("workingDays"),
+        name: elements[0].value.toUpperCase(),
+        phone: elements[1].value,
+        email: elements[2].value,
+        department: elements[3].value,
+        designation: elements[4].value,
+        working_days: elements[5].value,
         subjects: selectedSubjects,
     };
 
