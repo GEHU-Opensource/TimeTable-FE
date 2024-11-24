@@ -129,11 +129,11 @@ document.addEventListener('DOMContentLoaded', () => {
         subjects.forEach(subject => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><input type="text" class="subject-code" value="${subject.code}" /></td>
-                <td><input type="text" class="subject-name" value="${subject.name}" /></td>
+                <td><input type="text" class="subject-code" value="${subject.code}" required/></td>
+                <td><input type="text" class="subject-name" value="${subject.name}" required/></td>
                 <td>
                     <div class="select-wrapper">
-                        <select class="subject-credit">
+                        <select class="subject-credit" required>
                             <option value="0" ${subject.credit === "0" ? "selected" : ""}>0</option>
                             <option value="1" ${subject.credit === "1" ? "selected" : ""}>1</option>
                             <option value="2" ${subject.credit === "2" ? "selected" : ""}>2</option>
