@@ -67,3 +67,11 @@ const departments = [
     },
     // Add more departments as needed
 ];
+
+const preData = {
+    classes: [
+        { code: "C101", capacity: "50", type: "lt" },
+        { code: "C102", capacity: "30", type: "cr" },
+        { code: "C103", capacity: "25", type: "lab" },
+    ],
+};

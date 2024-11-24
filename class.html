@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Details</title>
+    <link rel="stylesheet" href="assets/styles/class.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="assets/images/logo.png" alt="logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="subject.html">Subject Details</a></li>
+                <li><a href="class.html">Class Details</a></li>
+                <li><a href="#">Generate TT</a></li>
+                <li><a href="#">Manual Update TT</a></li>
+                <li><a href="#">View TT</a></li>
+                <li><a href="#">Section Allocate</a></li>
+            </ul>
+        </nav>
+        <button class="logout-btn">Logout</button>
+    </header>
+
+    <main>
+        <h1>Class Details</h1>
+        <section class="action-section">
+            <button id="addClassBtn">Add Class</button>
+            <button id="submitClassBtn">Submit</button>
+        </section>
+        <table id="classTable">
+            <thead>
+                <tr>
+                    <th>Class Code</th>
+                    <th>Capacity</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamically filled rows go here -->
+            </tbody>
+        </table>
+    </main>
+
+    <script src="assets/scripts/data.js"></script>
+    <script src="assets/scripts/class.js"></script>
+</body>
+</html>
