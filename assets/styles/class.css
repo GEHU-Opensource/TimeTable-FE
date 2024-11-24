@@ -67,9 +67,8 @@ main {
     margin: 30px auto;
 }
 
-h1 {
+h2 {
     text-align: center;
-    font-size: 2rem;
     color: #333;
     margin-bottom: 20px;
 }
@@ -81,13 +80,13 @@ h1 {
 }
 
 .action-section button {
-    font-size: 1rem;
+    font-size: 1em;
     padding: 10px 20px;
     margin: 0 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 #addClassBtn {
@@ -125,11 +124,13 @@ h1 {
     text-align: left;
     padding: 12px;
     border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 #classTable th {
     font-weight: bold;
     color: #333;
+    background-color: #f1f1f1;
 }
 
 #classTable td input[type="text"],
@@ -158,7 +159,7 @@ h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 .delete-btn:hover {
