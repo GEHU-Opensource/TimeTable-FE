@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const elements = getFormElementNames();
         const data = {
-            name: elements[0].value,
+            name: elements[0].value.toUpperCase(),
             phone: elements[1].value,
             email: elements[2].value,
             department: elements[3].value,
