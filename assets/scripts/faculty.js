@@ -113,6 +113,7 @@ form.addEventListener("submit", (e) => {
     };
 
     console.log(data);
+    alert("Check the Console");
     form.reset();
     selectedSubjectsContainer.style.display = "none";
 });
