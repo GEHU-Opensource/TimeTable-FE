@@ -1,3 +1,13 @@
+const subjects = [
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Computer Science",
+    "Data Structures",
+    "Algorithms",
+    "Machine Learning",
+];
+
 const departments = [
     {
         name: "Computer Science Engineering",

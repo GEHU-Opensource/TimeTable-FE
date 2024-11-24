@@ -1,27 +1,30 @@
 const form = document.getElementById("facultyForm");
 const searchInput = document.getElementById("searchSubjects");
-const dropdown = document.querySelector(".dropdown-content");
-const checkboxes = document.querySelectorAll(".dropdown-content input[type='checkbox']");
+const dropdownContent = document.querySelector(".dropdown-content");
 const selectedSubjectsContainer = document.querySelector(".selected-subjects");
 const subjectList = document.getElementById("subjectList");
 
-function getFormElementNames() {
-    const elements = form.elements;
-    const elementDetails = [];
-    for(let i=0; i<elements.length; i++) {
-        const element = elements[i];
-        if(element.name) {
-            elementDetails.push({
-                name: element.name || "No Name",
-                value: element.value || ""
-            });
-        }
-    }
-    return elementDetails;
+function loadSubjects() {
+    dropdownContent.innerHTML = "";
+    subjects.forEach(subject => {
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = subject;
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${subject}`));
+        dropdownContent.appendChild(label);
+    });
+    const checkboxes = dropdownContent.querySelectorAll("input[type='checkbox']");
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", updateSelectedSubjects);
+    });
 }
 
 function getSelectedSubjects() {
     const selectedSubjects = [];
+    const checkboxes = dropdownContent.querySelectorAll("input[type='checkbox']");
     checkboxes.forEach(checkbox => {
         if(checkbox.checked) {
             selectedSubjects.push(checkbox.value);
@@ -46,40 +49,11 @@ function updateSelectedSubjects() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const selectedSubjects = getSelectedSubjects();
-        if(selectedSubjects.length === 0) {
-            alert("Please select at least one preferred subject.");
-            return;
-        }
-
-        const elements = getFormElementNames();
-        const data = {
-            name: elements[0].value.toUpperCase(),
-            phone: elements[1].value,
-            email: elements[2].value,
-            department: elements[3].value,
-            designation: elements[4].value,
-            working_days: elements[5].value,
-            subjects: selectedSubjects,
-        };
-
-        console.log(data);
-        document.getElementById('facultyForm').reset();selectedSubjectsContainer.style.display = "none";
-    });
-
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", updateSelectedSubjects);
-    });
-});
-
 searchInput.addEventListener("input", function () {
     const searchValue = this.value.toLowerCase();
-    const labels = document.querySelectorAll(".dropdown-content label");
+    const labels = dropdownContent.querySelectorAll("label");
     let hasVisibleOption = false;
+
     labels.forEach(label => {
         const text = label.textContent.toLowerCase();
         if(text.includes(searchValue)) {
@@ -90,15 +64,44 @@ searchInput.addEventListener("input", function () {
             label.style.display = "none";
         }
     });
-    dropdown.style.display = hasVisibleOption ? "block" : "none";
+    dropdownContent.style.display = hasVisibleOption ? "block" : "none";
 });
 
 document.addEventListener("click", function (event) {
-    if(!searchInput.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.style.display = "none";
+    if(!searchInput.contains(event.target) && !dropdownContent.contains(event.target)) {
+        dropdownContent.style.display = "none";
     }
 });
 
 searchInput.addEventListener("focus", function () {
-    dropdown.style.display = "block";
+    dropdownContent.style.display = "block";
+});
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const selectedSubjects = getSelectedSubjects();
+    if(selectedSubjects.length === 0) {
+        alert("Please select at least one preferred subject.");
+        return;
+    }
+
+    const formData = new FormData(form);
+    const data = {
+        name: formData.get("name").toUpperCase(),
+        phone: formData.get("number"),
+        email: formData.get("email"),
+        department: formData.get("department"),
+        designation: formData.get("designation"),
+        working_days: formData.get("workingDays"),
+        subjects: selectedSubjects,
+    };
+
+    console.log(data);
+    form.reset();
+    selectedSubjectsContainer.style.display = "none";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadSubjects();
 });
