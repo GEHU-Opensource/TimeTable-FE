@@ -31,6 +31,12 @@ nav ul li a {
     font-weight: bold;
 }
 
+nav ul li a:hover {
+    text-decoration: none;
+    color: #666;
+    font-weight: bold;
+}
+
 .logout-btn {
     background-color: #d62828;
     color: #fff;
@@ -100,13 +106,20 @@ table input:disabled, table select:disabled {
     cursor: pointer;
 }
 
+input[type="text"]:focus, select:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 5px rgba(40,167,69,0.8);
+    outline: none;
+    background-color: #f9fff9;
+}
+
 .edit-btn {
-    background-color: #f1c40f;
+    background-color: #0096c7;
     color: #fff;
 }
 
 .edit-btn:hover {
-    background-color: #f39c12;
+    background-color: #0077b6;
 }
 
 button.delete-btn {

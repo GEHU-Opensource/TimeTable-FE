@@ -21,21 +21,45 @@ const departments = [
                             {
                                 year: "1st Year",
                                 semesters: [
-                                    "Semester 1",
-                                    "Semester 2"
+                                    {
+                                        sem: "Semester 1",
+                                        timetable: ["test1.xlsx"],
+                                        subjects: [
+                                            { code: "CS101", name: "Introduction to Programming", credit: "4" },
+                                            { code: "CS102", name: "Mathematics I", credit: "3" }
+                                        ]
+                                    },
+                                    {
+                                        sem: "Semester 2",
+                                        timetable: ["test2.xlsx"],
+                                        subjects: [
+                                            { code: "CS201", name: "Data Structures", credit: "4" },
+                                            { code: "CS202", name: "Discrete Mathematics", credit: "3" }
+                                        ]
+                                    }
                                 ]
                             },
                             {
                                 year: "2nd Year",
                                 semesters: [
-                                    "Semester 3",
-                                    "Semester 4"
+                                    {
+                                        sem: "Semester 3",
+                                        timetable: ["test3.xlsx"],
+                                        subjects: [
+                                            { code: "CS301", name: "Algorithms", credit: "4" },
+                                            { code: "CS302", name: "Operating Systems", credit: "3" }
+                                        ]
+                                    },
+                                    {
+                                        sem: "Semester 4",
+                                        timetable: ["test4.xlsx"],
+                                        subjects: [
+                                            { code: "CS401", name: "Database Management Systems", credit: "4" },
+                                            { code: "CS402", name: "Computer Networks", credit: "3" }
+                                        ]
+                                    }
                                 ]
                             }
-                        ],
-                        subjects: [
-                            { code: "CS101", name: "Introduction to Programming", credit: "4" },
-                            { code: "CS102", name: "Mathematics I", credit: "3" },
                         ]
                     },
                     {
@@ -44,28 +68,52 @@ const departments = [
                             {
                                 year: "1st Year",
                                 semesters: [
-                                    "Semester 1",
-                                    "Semester 2"
+                                    {
+                                        sem: "Semester 1",
+                                        timetable: ["it_test1.xlsx"],
+                                        subjects: [
+                                            { code: "IT101", name: "Introduction to IT", credit: "4" },
+                                            { code: "IT102", name: "Mathematics for IT", credit: "3" }
+                                        ]
+                                    },
+                                    {
+                                        sem: "Semester 2",
+                                        timetable: ["it_test2.xlsx"],
+                                        subjects: [
+                                            { code: "IT201", name: "Data Structures", credit: "4" },
+                                            { code: "IT202", name: "Discrete Mathematics", credit: "3" }
+                                        ]
+                                    }
                                 ]
                             },
                             {
                                 year: "2nd Year",
                                 semesters: [
-                                    "Semester 3",
-                                    "Semester 4"
+                                    {
+                                        sem: "Semester 3",
+                                        timetable: ["it_test3.xlsx"],
+                                        subjects: [
+                                            { code: "IT301", name: "Web Development", credit: "4" },
+                                            { code: "IT302", name: "Operating Systems", credit: "3" }
+                                        ]
+                                    },
+                                    {
+                                        sem: "Semester 4",
+                                        timetable: ["it_test4.xlsx"],
+                                        subjects: [
+                                            { code: "IT401", name: "Database Management Systems", credit: "4" },
+                                            { code: "IT402", name: "Computer Networks", credit: "3" }
+                                        ]
+                                    }
                                 ]
                             }
-                        ],
-                        subjects: [
-                            { code: "IT101", name: "Introduction to IT", credit: "4" },
-                            { code: "IT102", name: "Mathematics for IT", credit: "3" },
                         ]
                     }
                 ]
             }
         ]
-    },
-    // Add more departments as needed
+    }
+    // Add more departments here if needed
 ];
 
 const preData = {
@@ -75,3 +123,5 @@ const preData = {
         { code: "C103", capacity: "25", type: "lab" },
     ],
 };
+
+const generateTT = 'test1.xlsx';

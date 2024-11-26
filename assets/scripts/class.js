@@ -1,21 +1,13 @@
-// Ensure data.js is included in your HTML file
-// <script src="data.js"></script>
-
 document.addEventListener('DOMContentLoaded', () => {
     const existingClassTableBody = document.querySelector('#existingClassTable tbody');
     const newClassTableBody = document.querySelector('#classTable tbody');
     const addClassBtn = document.getElementById('addClassBtn');
     const submitClassBtn = document.getElementById('submitClassBtn');
 
-    // Populate existing data from data.js
     preData.classes.forEach(item => addExistingRow(item.code, item.capacity, item.type));
-
-    // Add new class row
     addClassBtn.addEventListener('click', () => {
         addNewClassRow('', '', '');
     });
-
-    // Submit new class data
     submitClassBtn.addEventListener('click', () => {
         const rows = newClassTableBody.querySelectorAll('tr');
         const data = [];
@@ -23,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const code = row.querySelector('.class-code').value.trim();
             const capacity = row.querySelector('.class-capacity').value.trim();
             const type = row.querySelector('.class-type').value;
-            if (code && capacity && type) {
+            if(code && capacity && type) {
                 data.push({ code, capacity, type });
                 alert("Check the Console!");
                 console.log('New Class Data:', data);
@@ -34,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Functions
     function addExistingRow(code, capacity, type) {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -57,19 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputs = row.querySelectorAll('input, select');
 
         editBtn.addEventListener('click', () => {
-            if (editBtn.textContent === 'Edit') {
+            if(editBtn.textContent === 'Edit') {
                 inputs.forEach(input => input.disabled = false);
                 editBtn.textContent = 'Save';
-            } else {
+            }
+            else {
                 inputs.forEach(input => input.disabled = true);
-                if (inputs[0].value.trim() !== "" && inputs[1].value.trim() !== "" && inputs[2].value.trim() !== "") {
+                if(inputs[0].value.trim() !== "" && inputs[1].value.trim() !== "" && inputs[2].value.trim() !== "") {
                     console.log('Edited Data:', {
                         code: inputs[0].value.trim(),
                         capacity: inputs[1].value.trim(),
                         type: inputs[2].value.trim(),
                     });
                     editBtn.textContent = 'Edit';
-                } else {
+                }
+                else {
                     alert("Please fill the Class Details!");
                     inputs.forEach(input => input.disabled = false); // Re-enable inputs for correction
                     return;

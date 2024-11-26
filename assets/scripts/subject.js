@@ -1,27 +1,170 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const departmentSelect = document.getElementById('department');
-    const courseSelect = document.getElementById('course');
-    const branchSelect = document.getElementById('branch');
-    const yearSelect = document.getElementById('year');
-    const semesterSelect = document.getElementById('semester');
-    const subjectTable = document.getElementById('subjectTable');
-    const getSubjectsBtn = document.getElementById('getSubjects');
-    const addSubjectBtn = document.getElementById('addSubjectBtn');
-    const submitBtn = document.getElementById('submitBtn');
+document.addEventListener("DOMContentLoaded", function () {
+    const departmentDropdown = document.getElementById("department");
+    const courseDropdown = document.getElementById("course");
+    const branchDropdown = document.getElementById("branch");
+    const yearDropdown = document.getElementById("year");
+    const semesterDropdown = document.getElementById("semester");
+    const getSubjectsButton = document.getElementById("getSubjects");
+    const existingSubjectTableBody = document.querySelector("#subjectListTable tbody");
+    const newSubjectTableBody = document.querySelector("#newSubjectTable tbody");
+    const addSubjectBtn = document.getElementById("addSubjectBtn");
+    const submitBtn = document.getElementById("submitBtn");
 
     if(typeof departments!=='undefined') {
         departments.forEach(department => {
             const option = document.createElement('option');
             option.value = department.name;
             option.textContent = department.name;
-            departmentSelect.appendChild(option);
+            departmentDropdown.appendChild(option);
         });
     }
     else {
         console.error("Departments data is not defined.");
     }
 
-    addSubjectBtn.addEventListener('click', () => {
+    function clearDropdown(dropdown) {
+        dropdown.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select an option';
+        dropdown.appendChild(defaultOption);
+    }
+
+    function populateDropdown(dropdown, options, valueKey, textKey) {
+        options.forEach(option => {
+            const opt = document.createElement("option");
+            opt.value = option[valueKey];
+            opt.textContent = option[textKey];
+            dropdown.appendChild(opt);
+        });
+    }
+
+    departmentDropdown.addEventListener("change", function () {
+        const selectedDepartment = departmentDropdown.value;
+        clearDropdown(courseDropdown);
+        populateDropdown(courseDropdown, departments.find(dep => dep.name === selectedDepartment)?.courses || [], "name", "name");
+    });
+
+    courseDropdown.addEventListener("change", function () {
+        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
+        clearDropdown(branchDropdown);
+        populateDropdown(branchDropdown, selectedCourse?.branches || [], "name", "name");
+    });
+
+    branchDropdown.addEventListener("change", function () {
+        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
+        const selectedBranch = selectedCourse?.branches.find(branch => branch.name === branchDropdown.value);
+        clearDropdown(yearDropdown);
+        populateDropdown(yearDropdown, selectedBranch?.years || [], "year", "year");
+    });
+
+    yearDropdown.addEventListener("change", function () {
+        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
+        const selectedBranch = selectedCourse?.branches.find(branch => branch.name === branchDropdown.value);
+        const selectedYear = selectedBranch?.years.find(year => year.year === yearDropdown.value);
+        clearDropdown(semesterDropdown);
+        populateDropdown(semesterDropdown, selectedYear?.semesters || [], "sem", "sem");
+    });
+
+    function displayExistingSubjects(subjects) {
+        existingSubjectTableBody.innerHTML = '';
+        subjects.forEach(subject => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="subject-code" value="${subject.code}" disabled /></td>
+                <td><input type="text" class="subject-name" value="${subject.name}" disabled /></td>
+                <td>
+                    <select class="subject-credit" disabled>
+                        <option value="0" ${subject.credit === "0" ? "selected" : ""}>0</option>
+                        <option value="1" ${subject.credit === "1" ? "selected" : ""}>1</option>
+                        <option value="2" ${subject.credit === "2" ? "selected" : ""}>2</option>
+                        <option value="3" ${subject.credit === "3" ? "selected" : ""}>3</option>
+                        <option value="4" ${subject.credit === "4" ? "selected" : ""}>4</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                </td>
+            `;
+            const editButton = row.querySelector('.edit-btn');
+            const deleteButton = row.querySelector('.delete-btn');
+            const inputs = row.querySelectorAll('input, select');
+            editButton.addEventListener('click', () => {
+                if(editButton.textContent === "Edit") {
+                    inputs.forEach(input => input.disabled = false);
+                    editButton.textContent = 'Save';
+                }
+                else {
+                    const selectedDepartment = departmentDropdown.value;
+                    const selectedCourse = courseDropdown.value;
+                    const selectedBranch = branchDropdown.value;
+                    const selectedYear = yearDropdown.value;
+                    const selectedSemester = semesterDropdown.value;
+                    const data = {
+                        department: selectedDepartment,
+                        course: selectedCourse,
+                        branch: selectedBranch,
+                        year: selectedYear,
+                        semester: selectedSemester,
+                        subjects: []
+                    };
+                    inputs.forEach(input => input.disabled = true);
+                    if(inputs[0].value.trim() !== "" && inputs[1].value.trim() !== "" && inputs[2].value.trim() !== "") {
+                        const editedsubject = {
+                            code: inputs[0].value.trim(),
+                            name: inputs[1].value.trim(),
+                            credit: inputs[2].value.trim(),
+                        };
+                        data.subjects.push(editedsubject);
+                        console.log('Edited Data:', data);
+                        editButton.textContent = 'Edit';
+                    }
+                    else {
+                        alert("Please fill the Class Details!");
+                        inputs.forEach(input => input.disabled = false); // Re-enable inputs for correction
+                        return;
+                    }
+                }
+            });
+            deleteButton.addEventListener('click', () => {
+                let result = confirm("Are you sure to Delete?");
+                if(result) {
+                    row.remove();
+                }
+                else {
+                    return ;
+                }
+            });
+            existingSubjectTableBody.appendChild(row);
+        });
+    }
+
+    getSubjectsButton.addEventListener("click", function () {
+        const subjectDatas = document.getElementById("subjectData");
+        subjectDatas.style.display = "block";
+        const selectedDepartment = departmentDropdown.value;
+        const selectedCourse = courseDropdown.value;
+        const selectedBranch = branchDropdown.value;
+        const selectedYear = yearDropdown.value;
+        const selectedSemester = semesterDropdown.value;
+        if(!selectedDepartment || !selectedCourse || !selectedBranch || !selectedYear || !selectedSemester) {
+            alert("Please fill in all the fields.");
+            return;
+        }
+        const department = departments.find(department => department.name === selectedDepartment);
+        const course = department.courses.find(course => course.name === selectedCourse);
+        const branch = course.branches.find(branch => branch.name === selectedBranch);
+        const year = branch.years.find(year => year.year === selectedYear);
+        const semester = year.semesters.find(sem => sem.sem === selectedSemester);
+        const fetchedSubjects = semester.subjects;
+        displayExistingSubjects(fetchedSubjects);
+    });
+
+    addSubjectBtn.addEventListener("click", function () {
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
             <td><input type="text" class="subject-code" placeholder="Enter Subject Code" /></td>
@@ -37,19 +180,25 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
             <td><button class="delete-btn">Delete</button></td>
         `;
-        const subjectTableBody = document.querySelector('#subjectListTable tbody');
-        subjectTableBody.appendChild(newRow);
-        newRow.querySelector('.delete-btn').addEventListener('click', () => {
-            newRow.remove();
+        const deleteButton = newRow.querySelector('.delete-btn');
+        deleteButton.addEventListener('click', () => {
+            let result = confirm("Are you sure to Delete?");
+            if(result) {
+                newRow.remove();
+            }
+            else {
+                return ;
+            }
         });
+        newSubjectTableBody.appendChild(newRow);
     });
 
-    submitBtn.addEventListener('click', () => {
-        const selectedDepartment = departmentSelect.value;
-        const selectedCourse = courseSelect.value;
-        const selectedBranch = branchSelect.value;
-        const selectedYear = yearSelect.value;
-        const selectedSemester = semesterSelect.value;
+    submitBtn.addEventListener("click", function () {
+        const selectedDepartment = departmentDropdown.value;
+        const selectedCourse = courseDropdown.value;
+        const selectedBranch = branchDropdown.value;
+        const selectedYear = yearDropdown.value;
+        const selectedSemester = semesterDropdown.value;
         const data = {
             department: selectedDepartment,
             course: selectedCourse,
@@ -58,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             semester: selectedSemester,
             subjects: []
         };
-        const subjectRows = document.querySelectorAll('#subjectListTable tbody tr');
+        const subjectRows = document.querySelectorAll('#newSubjectTable tr');
         let allFieldsFilled = true;
 
         subjectRows.forEach(row => {
@@ -92,144 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if(data.subjects.length > 0) {
             console.log('Submitted Data:', data);
             alert("Check the Console");
-            departmentSelect.value = "";
-            courseSelect.value = "";
-            branchSelect.value = "";
-            yearSelect.value = "";
-            semesterSelect.value = "";
-            document.getElementById("subjectTable").style.display = "none";
         }
         else {
             alert("No subjects to submit.");
-        }
-    });
-
-    getSubjectsBtn.addEventListener('click', () => {
-        const selectedDepartment = departmentSelect.value;
-        const selectedCourse = courseSelect.value;
-        const selectedBranch = branchSelect.value;
-        const selectedYear = yearSelect.value;
-        const selectedSemester = semesterSelect.value;
-
-        if(!selectedDepartment || !selectedCourse || !selectedBranch || !selectedYear || !selectedSemester) {
-            alert("Please fill in all the fields.");
-            return;
-        }
-        const department = departments.find(department => department.name === selectedDepartment);
-        const course = department.courses.find(course => course.name === selectedCourse);
-        const branch = course.branches.find(branch => branch.name === selectedBranch);
-        const year = branch.years.find(year => year.year === selectedYear);
-        const fetchedSubjects = branch.subjects;
-        displaySubjects(fetchedSubjects);
-    });
-
-    function displaySubjects(subjects) {
-        const subjectTableBody = document.querySelector('#subjectListTable tbody');
-        subjectTableBody.innerHTML = '';
-        subjects.forEach(subject => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="text" class="subject-code" value="${subject.code}" required/></td>
-                <td><input type="text" class="subject-name" value="${subject.name}" required/></td>
-                <td>
-                    <div class="select-wrapper">
-                        <select class="subject-credit" required>
-                            <option value="0" ${subject.credit === "0" ? "selected" : ""}>0</option>
-                            <option value="1" ${subject.credit === "1" ? "selected" : ""}>1</option>
-                            <option value="2" ${subject.credit === "2" ? "selected" : ""}>2</option>
-                            <option value="3" ${subject.credit === "3" ? "selected" : ""}>3</option>
-                            <option value="4" ${subject.credit === "4" ? "selected" : ""}>4</option>
-                        </select>
-                    </div>
-                </td>
-                <td><button class="delete-btn">Delete</button></td>
-            `;
-            row.querySelector('.delete-btn').addEventListener('click', () => {
-                let result = confirm("Are you sure to Delete?");
-                if(result) {
-                    row.remove();
-                }
-                else {
-                    return ;
-                }
-            });
-            subjectTableBody.appendChild(row);
-        });
-        subjectTable.style.display = 'block';
-    }
-
-    departmentSelect.addEventListener('change', () => {
-        courseSelect.innerHTML = '<option value="" selected>Select Course</option>';
-        branchSelect.innerHTML = '<option value="" selected>Select Branch</option>';
-        yearSelect.innerHTML = '<option value="" selected>Select Year</option>';
-        semesterSelect.innerHTML = '<option value="" selected>Select Semester</option>';
-        const selectedDepartment = departmentSelect.value;
-        if(selectedDepartment) {
-            const department = departments.find(department => department.name === selectedDepartment);
-            department.courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.name;
-                option.textContent = course.name;
-                courseSelect.appendChild(option);
-            });
-        }
-    });
-
-    courseSelect.addEventListener('change', () => {
-        branchSelect.innerHTML = '<option value="" selected>Select Branch</option>';
-        yearSelect.innerHTML = '<option value="" selected>Select Year</option>';
-        semesterSelect.innerHTML = '<option value="" selected>Select Semester</option>';
-
-        const selectedCourse = courseSelect.value;
-        if (selectedCourse) {
-            const selectedDepartment = departmentSelect.value;
-            const department = departments.find(department => department.name === selectedDepartment);
-            const course = department.courses.find(course => course.name === selectedCourse);
-            course.branches.forEach(branch => {
-                const option = document.createElement('option');
-                option.value = branch.name;
-                option.textContent = branch.name;
-                branchSelect.appendChild(option);
-            });
-        }
-    });
-
-    branchSelect.addEventListener('change', () => {
-        yearSelect.innerHTML = '<option value="" selected>Select Year</option>';
-        semesterSelect.innerHTML = '<option value="" selected>Select Semester</option>';
-        const selectedBranch = branchSelect.value;
-        if(selectedBranch) {
-            const selectedDepartment = departmentSelect.value;
-            const selectedCourse = courseSelect.value;
-            const department = departments.find(department => department.name === selectedDepartment);
-            const course = department.courses.find(course => course.name === selectedCourse);
-            const branch = course.branches.find(branch => branch.name === selectedBranch);
-            branch.years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year.year;
-                option.textContent = year.year;
-                yearSelect.appendChild(option);
-            });
-        }
-    });
-
-    yearSelect.addEventListener('change', () => {
-        semesterSelect.innerHTML = '<option value="" selected>Select Semester</option>';
-        const selectedYear = yearSelect.value;
-        if(selectedYear) {
-            const selectedDepartment = departmentSelect.value;
-            const selectedCourse = courseSelect.value;
-            const selectedBranch = branchSelect.value;
-            const department = departments.find(department => department.name === selectedDepartment);
-            const course = department.courses.find(course => course.name === selectedCourse);
-            const branch = course.branches.find(branch => branch.name === selectedBranch);
-            const year = branch.years.find(year => year.year === selectedYear);
-            year.semesters.forEach(semester => {
-                const option = document.createElement('option');
-                option.value = semester;
-                option.textContent = semester;
-                semesterSelect.appendChild(option);
-            });
         }
     });
 });

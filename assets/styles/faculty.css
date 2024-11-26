@@ -6,10 +6,6 @@ body {
     padding: 0;
 }
 
-::selection {
-    background-color: #75da8d;
-}
-
 .header {
     position: relative;
     padding: 30px;

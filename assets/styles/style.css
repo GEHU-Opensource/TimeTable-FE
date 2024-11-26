@@ -1,4 +1,3 @@
-/* General Styling */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -7,11 +6,6 @@ body {
     padding: 0;
 }
 
-::selection {
-    background-color: #75da8d;
-}
-
-/* Header Styling */
 .header {
     position: relative;
     padding: 30px;
@@ -23,7 +17,6 @@ body {
     left: 50px;
 }
 
-/* Container Styling */
 .login-container {
     width: 80%;
     max-width: 400px;
@@ -42,7 +35,6 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Input and Label Styling */
 label {
     margin-top: 10px;
     display: block;
@@ -69,7 +61,6 @@ input:focus, select:focus, button:focus {
     background-color: #f9fff9;
 }
 
-/* Button Styling */
 button {
     background-color: #28a745;
     color: white;
@@ -86,7 +77,6 @@ button:hover {
     background-color: #218838;
 }
 
-/* Error Message Styling */
 .error-message {
     color: red;
     font-size: 14px;
@@ -94,7 +84,6 @@ button:hover {
     display: none;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .container {
         width: 90%;
