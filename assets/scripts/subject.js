@@ -145,7 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><button class="delete-btn">Delete</button></td>
             `;
             row.querySelector('.delete-btn').addEventListener('click', () => {
-                row.remove();
+                let result = confirm("Are you sure to Delete?");
+                if(result) {
+                    row.remove();
+                }
+                else {
+                    return ;
+                }
             });
             subjectTableBody.appendChild(row);
         });

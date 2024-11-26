@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = row.querySelector('.class-type').value;
             if (code && capacity && type) {
                 data.push({ code, capacity, type });
-                alert("Check the Console!");
                 console.log('New Class Data:', data);
             }
             else {
