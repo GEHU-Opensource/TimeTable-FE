@@ -59,6 +59,33 @@ function loadSubjects() {
         label.appendChild(document.createTextNode(` ${subject}`));
         dropdownContent.appendChild(label);
     });
+    /*
+    fetch("api", {
+        method: "GET",
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Parse JSON from the response
+    })
+    .then(subjects => {
+        subjects.forEach(subject => { // Loop through the array of subjects
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = subject;
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${subject}`));
+            dropdownContent.appendChild(label);
+        });
+    })
+    .catch(error => {
+        console.error("Error: ", error);
+        alert("System Failure");
+    });*/
+
     const checkboxes = dropdownContent.querySelectorAll("input[type='checkbox']");
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener("change", updateSelectedSubjects);
@@ -187,31 +214,5 @@ form.addEventListener("submit", (e) => {
 
 document.addEventListener("DOMContentLoaded", () => {
     
-    /*
-    fetch("api", {
-        method: "GET",
-    })
-    .then(response => {
-        if(!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json(); // Parse JSON from the response
-    })
-    .then(subjects => {
-        subjects.forEach(subject => { // Loop through the array of subjects
-            const label = document.createElement("label");
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = subject;
-
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(` ${subject}`));
-            dropdownContent.appendChild(label);
-        });
-    })
-    .catch(error => {
-        console.error("Error: ", error);
-        alert("System Failure");
-    });*/
     loadSubjects();
 });
