@@ -104,6 +104,22 @@ h2 {
     box-sizing: border-box;
 }
 
+#download-btn {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#download-btn:hover {
+    background-color: #218838;
+}
+
 select:focus, button:focus {
     border-color: #28a745;
     box-shadow: 0 0 5px rgba(40,167,69,0.8);

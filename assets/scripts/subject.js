@@ -214,6 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const year = branch.years.find(year => year.year === selectedYear);
         const semester = year.semesters.find(sem => sem.sem === selectedSemester);
         const fetchedSubjects = semester.subjects;
+        //branch = (branch !== "No Branch") ? branch : "";
         /*
         fetch("api", {
             method: "GET",
@@ -272,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = {
             department: selectedDepartment,
             course: selectedCourse,
-            branch: selectedBranch,
+            branch: selectedBranch !== "No Branch" ? selectedBranch : "",
             year: selectedYear,
             semester: selectedSemester,
             subjects: []
@@ -309,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         if(data.subjects.length > 0) {
+            /*
             fetch("api", {
                 method: "POST",
                 headers: {
@@ -329,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => {
                 console.error("Error adding classes:", error);
                 alert("Failed to add classes. Please try again.");
-            });
+            });*/
             console.log('Submitted Data:', data);
             alert("Check the Console");
         }

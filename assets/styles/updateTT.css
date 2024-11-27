@@ -108,32 +108,36 @@ h2 {
     display: flex;
     align-items: center;
     gap: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
 }
 
 .file-label {
-    background-color: #007bff;
-    color: white;
+    background-color: #adb5bd;
+    color: #fff;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
     text-align: center;
-    transition: background-color 0.3s ease;
 }
 
 .file-label:hover {
-    background-color: #0056b3;
+    background-color: #6c757d;
 }
 
 #file-chosen {
     font-size: 14px;
     color: #555;
+    font-weight: bold;
+    margin-left: 10px;
 }
 
 input[type="file"] {
     display: none;
 }
-
 
 select:focus, button:focus {
     border-color: #28a745;

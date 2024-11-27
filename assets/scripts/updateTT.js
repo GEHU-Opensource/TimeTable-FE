@@ -12,6 +12,34 @@ document.addEventListener("DOMContentLoaded", function () {
         fileChosen.textContent = fileInput.files[0]?.name || "No file chosen";
     });
 
+    /*
+    fetch("api", {
+        method: "GET",
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(departments => {
+        if (Array.isArray(departments) && departments.length>0) {
+            departments.forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.name;
+                option.textContent = department.name;
+                departmentDropdown.appendChild(option);
+            });
+        }
+        else {
+            console.error("No departments found or invalid data format.");
+        }
+    })
+    .catch(error => {
+        console.log("Error: ",error);
+        alert("System Failure");
+    });*/
+
     if (typeof departments !== 'undefined') {
         departments.forEach(department => {
             const option = document.createElement('option');
@@ -71,31 +99,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     updateButton.addEventListener("click", function () {
-        const formData = new FormData();
-        const selectedFile = fileInput.files[0];
-        formData.append("department", departmentDropdown.value);
-        formData.append("course", courseDropdown.value);
-        formData.append("branch", branchDropdown.value);
-        formData.append("year", yearDropdown.value);
-        formData.append("semester", semesterDropdown.value);
-        if (selectedFile) {
-            formData.append("ttFile", selectedFile);
-        } else {
+        const data = {
+            department: departmentDropdown.value,
+            course: courseDropdown.value,
+            branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+            year: yearDropdown.value,
+            semester: semesterDropdown.value,
+            ttFile: fileInput.files[0],
+        };
+        if(!data.department || !data.course || !data.year || !data.semester) {
+            alert("Fill the Details!");
+            return ;
+        }
+        
+        if(!fileInput.files.length) {
             alert("Please select a file before submitting.");
             return;
         }
-        console.log("FormData Contents:");
-        for (const [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-        }
 
-        alert("Timetable updated successfully!");
+        console.log("Form Data:", data);
+        alert("Updated successfully!");
         /*
-        fetch("https://your-backend-endpoint.com/update-timetable", {
+        fetch("api", {
             method: "POST",
-            body: formData,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log("Success:", data);
             alert("Timetable updated successfully!");

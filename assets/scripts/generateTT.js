@@ -5,7 +5,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const yearDropdown = document.getElementById("year");
     const semesterDropdown = document.getElementById("semester");
     const generateButton = document.getElementById("generateTT");
+    const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
+
+    /*fetch("api", {
+        method: "GET",
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(departments => {
+        if (Array.isArray(departments) && departments.length>0) {
+            departments.forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.name;
+                option.textContent = department.name;
+                departmentDropdown.appendChild(option);
+            });
+        }
+        else {
+            console.error("No departments found or invalid data format.");
+        }
+    })
+    .catch(error => {
+        console.log("Error: ",error);
+        alert("System Failure");
+    });*/
 
     if(typeof departments!=='undefined') {
         departments.forEach(department => {
@@ -67,9 +95,33 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     generateButton.addEventListener("click", function() {
-        const file = generateTT;
+        const data = {
+            department: departmentDropdown.value,
+            course: courseDropdown.value,
+            branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+            year: yearDropdown.value,
+            semester: semesterDropdown.value,
+        };
+        if(!data.department || !data.course || !data.year || !data.semester) {
+            alert("Fill the Details!");
+            return ;
+        }
+        if(branch==="") {
+            // 
+        }
+        else {
+            
+        }
+        const file = generateTT; // API:departmen/course/branch/year/semester
+
         if(typeof file !== "undefined") {
-            fetch(file)
+            fetch(file, {
+                method: "GET",
+                headers: {
+                    // Add any required headers (e.g., authentication token if needed)
+                    'Content-Type': 'application/json',
+                },
+            })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Network response was not ok " + response.statusText);
@@ -95,6 +147,37 @@ document.addEventListener("DOMContentLoaded", function () {
         else {
             alert("Excel file path is missing in data.js.");
         }
+    });
+
+    downloadButton.addEventListener('click', () => {
+        const apiEndpoint = generateTT; // Replace with your API endpoint
+
+        fetch(apiEndpoint, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok: " + response.statusText);
+            }
+            const contentDisposition = response.headers.get('Content-Disposition');
+            const filename = contentDisposition && contentDisposition.includes('filename=') ? contentDisposition.split('filename=')[1].trim().replace(/"/g, '') : 'timeTable_new.xlsx'; // Default filename if not found
+
+            return response.blob().then(blob => ({ filename, blob }));
+        })
+        .then(({ filename, blob }) => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        })
+        .catch(error => {
+            alert("Failed to download the file: " + error.message);
+        });
     });
 
     function populateSheetSelector(sheetNames) {
