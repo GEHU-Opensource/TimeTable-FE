@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addClassBtn.addEventListener('click', () => {
         addNewClassRow('', '', '');
     });
+    
     submitClassBtn.addEventListener('click', () => {
         const rows = newClassTableBody.querySelectorAll('tr');
         const data = [];
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else {
                 inputs.forEach(input => input.disabled = true);
                 if(inputs[0].value.trim() !== "" && inputs[1].value.trim() !== "" && inputs[2].value.trim() !== "") {
+                    alert("Check the Console");
                     console.log('Edited Data:', {
                         code: inputs[0].value.trim(),
                         capacity: inputs[1].value.trim(),
