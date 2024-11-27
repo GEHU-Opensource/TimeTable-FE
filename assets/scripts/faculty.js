@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     const departmentDropdown = document.getElementById("department");
     /*
     fetch("api", {

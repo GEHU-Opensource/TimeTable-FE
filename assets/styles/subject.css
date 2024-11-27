@@ -1,12 +1,8 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
 
 header {
@@ -15,7 +11,7 @@ header {
     align-items: center;
     padding: 10px 20px;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 header img {
@@ -26,10 +22,6 @@ nav ul {
     list-style: none;
     display: flex;
     gap: 20px;
-}
-
-nav ul li {
-    display: inline;
 }
 
 nav ul li a {
@@ -57,7 +49,6 @@ nav ul li a:hover {
 .logout-btn:hover {
     background-color: #9a031e;
 }
-
 
 main {
     display: flex;
@@ -104,7 +95,7 @@ h2 {
     box-sizing: border-box;
 }
 
-select:focus, button:focus {
+select:focus {
     border-color: #28a745;
     box-shadow: 0 0 5px rgba(40,167,69,0.8);
     outline: none;

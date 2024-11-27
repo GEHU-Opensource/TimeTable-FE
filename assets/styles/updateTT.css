@@ -139,7 +139,7 @@ input[type="file"] {
     display: none;
 }
 
-select:focus, button:focus {
+select:focus {
     border-color: #28a745;
     box-shadow: 0 0 5px rgba(40,167,69,0.8);
     outline: none;

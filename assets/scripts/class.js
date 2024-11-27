@@ -138,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Re-enable inputs for correction in case of failure
                             inputs.forEach(input => input.disabled = false);
                         });*/
+                        
+                    editBtn.textContent = 'Edit';
                 }
                 else {
                     alert("Please fill the Class Details!");

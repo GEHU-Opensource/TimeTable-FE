@@ -54,7 +54,7 @@ input, select {
     transition: all 0.3s ease-in-out;
 }
 
-input:focus, select:focus, button:focus {
+input:focus, select:focus {
     border-color: #28a745;
     box-shadow: 0 0 5px rgba(40, 167, 69, 0.8);
     outline: none;
