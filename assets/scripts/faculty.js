@@ -1,3 +1,46 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const departmentDropdown = document.getElementById("department");
+    /*
+    fetch("api", {
+        method: "GET",
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(departments => {
+        if (Array.isArray(departments) && departments.length>0) {
+            departments.forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.name;
+                option.textContent = department.name;
+                departmentDropdown.appendChild(option);
+            });
+        }
+        else {
+            console.error("No departments found or invalid data format.");
+        }
+    })
+    .catch(error => {
+        console.log("Error: ",error);
+        alert("System Failure");
+    });*/
+
+    if(typeof departments!=='undefined') {
+        departments.forEach(department => {
+            const option = document.createElement('option');
+            option.value = department.name;
+            option.textContent = department.name;
+            departmentDropdown.appendChild(option);
+        });
+    }
+    else {
+        console.error("Departments data is not defined.");
+    }
+});
+
 const form = document.getElementById("facultyForm");
 const searchInput = document.getElementById("searchSubjects");
 const dropdownContent = document.querySelector(".dropdown-content");
@@ -108,16 +151,67 @@ form.addEventListener("submit", (e) => {
         email: elements[2].value,
         department: elements[3].value,
         designation: elements[4].value,
-        working_days: elements[5].value,
-        subjects: selectedSubjects,
+        workingDays: elements[5].value,
+        subjects: selectedSubjects, // Assuming `selectedSubjects` is an array
     };
 
-    console.log(data);
-    alert("Your details has been submitted.\nThank You");
+    // Log the data to the console
+    console.log("Data to be posted:", data);
+
+    /*
+    fetch("https://your-backend-endpoint.com/api/submit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json", // Set content type to JSON
+        },
+        body: JSON.stringify(data), // Convert the object to JSON string
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Data posted successfully:", data);
+        alert("Data submitted successfully!");
+    })
+    .catch(error => {
+        console.error("Error posting data:", error);
+        alert("Failed to submit data. Please try again.");
+    });
+    */
     form.reset();
     selectedSubjectsContainer.style.display = "none";
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    
+    /*
+    fetch("api", {
+        method: "GET",
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Parse JSON from the response
+    })
+    .then(subjects => {
+        subjects.forEach(subject => { // Loop through the array of subjects
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = subject;
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${subject}`));
+            dropdownContent.appendChild(label);
+        });
+    })
+    .catch(error => {
+        console.error("Error: ", error);
+        alert("System Failure");
+    });*/
     loadSubjects();
 });

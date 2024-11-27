@@ -10,6 +10,34 @@ document.addEventListener("DOMContentLoaded", function () {
     const addSubjectBtn = document.getElementById("addSubjectBtn");
     const submitBtn = document.getElementById("submitBtn");
 
+    /*
+    fetch("api", {
+        method: "GET",
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(departments => {
+        if (Array.isArray(departments) && departments.length>0) {
+            departments.forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.name;
+                option.textContent = department.name;
+                departmentDropdown.appendChild(option);
+            });
+        }
+        else {
+            console.error("No departments found or invalid data format.");
+        }
+    })
+    .catch(error => {
+        console.log("Error: ",error);
+        alert("System Failure");
+    });*/
+
     if(typeof departments!=='undefined') {
         departments.forEach(department => {
             const option = document.createElement('option');
@@ -134,6 +162,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 let result = confirm("Are you sure to Delete?");
                 if(result) {
                     row.remove();
+                    /*
+                    fetch(`api/${inputs[0].value.trim()}`, {
+                        method: "DELETE", // Use the HTTP DELETE method
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json(); // Parse JSON response if needed
+                    })
+                    .then(data => {
+                        console.log("Deletion successful:", data);
+                        alert("Item deleted successfully!");
+                    })
+                    .catch(error => {
+                        console.error("Error deletingitem:", error);
+                        alert("Failed to delete item. Please try again.");
+                    });*/
                 }
                 else {
                     return ;
@@ -151,6 +197,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedBranch = branchDropdown.value;
         const selectedYear = yearDropdown.value;
         const selectedSemester = semesterDropdown.value;
+        const params = new URLSearchParams({
+            department: selectedDepartment,
+            course: selectedCourse,
+            branch: selectedBranch,
+            year: selectedYear,
+            semester: selectedSemester,
+        });
         if(!selectedDepartment || !selectedCourse || !selectedBranch || !selectedYear || !selectedSemester) {
             alert("Please fill in all the fields.");
             return;
@@ -161,6 +214,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const year = branch.years.find(year => year.year === selectedYear);
         const semester = year.semesters.find(sem => sem.sem === selectedSemester);
         const fetchedSubjects = semester.subjects;
+        /*
+        fetch("api", {
+            method: "GET",
+        })
+        .then(response => {
+            if(!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(fetchedSubjects => {
+            displayExistingSubjects(fetchedSubjects);
+        })
+        .catch(error => {
+            console.log("Error: ",error);
+            alert("System Failure");
+        });*/
         displayExistingSubjects(fetchedSubjects);
     });
 
@@ -239,6 +309,27 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         if(data.subjects.length > 0) {
+            fetch("api", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Inform the server about the JSON format
+                },
+                body: JSON.stringify(data), // Convert the array of objects to a JSON string
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json(); // Parse the JSON response
+            })
+            .then(serverResponse => {
+                console.log("Server Response:", serverResponse);
+                alert("Classes added successfully!");
+            })
+            .catch(error => {
+                console.error("Error adding classes:", error);
+                alert("Failed to add classes. Please try again.");
+            });
             console.log('Submitted Data:', data);
             alert("Check the Console");
         }
