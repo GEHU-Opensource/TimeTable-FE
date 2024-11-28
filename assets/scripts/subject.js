@@ -1,3 +1,17 @@
+window.addEventListener("hashchange", (event) => {
+    let isLogged = sessionStorage.getItem("isLoggedin");
+    if(!isLogged || isLogged!=="true") {
+        alert("Please Login First!!");
+        window.location.href = "admin.html";
+    }
+})
+let isLogged = sessionStorage.getItem("isLoggedin");
+if(!isLogged || isLogged!=="true") {
+    alert("Please Login First!!");
+    window.location.href = "admin.html";
+}
+else {
+    console.log("Logged IN",is);
     document.addEventListener("DOMContentLoaded", () => {
         const departmentDropdown = document.getElementById("department");
         const courseDropdown = document.getElementById("course");
@@ -9,7 +23,11 @@
         const newSubjectTableBody = document.querySelector("#newSubjectTable tbody");
         const addSubjectBtn = document.getElementById("addSubjectBtn");
         const submitBtn = document.getElementById("submitBtn");
-
+        const logoutBtn = document.querySelector(".logout-btn");
+        logoutBtn.addEventListener("click", () => {
+            sessionStorage.setItem("isLoggedin","false");
+            window.location.href = "admin.html";
+        });
         /*
         fetch("api", {
             method: "GET",
@@ -342,3 +360,4 @@
             }
         });
     });
+}

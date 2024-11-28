@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const newClassTableBody = document.querySelector('#classTable tbody');
     const addClassBtn = document.getElementById('addClassBtn');
     const submitClassBtn = document.getElementById('submitClassBtn');
+    const baseurl = "http://127.0.0.1:8000";
     
-    /*
-    fetch("api", {
+    fetch(`${baseurl}/getRooms/`, {
         method: "GET",
     })
     .then(response => {
@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => {
         console.log("Error: ",error);
         alert("System Failure");
-    });*/
+    });
 
-    preData.classes.forEach(item => addExistingRow(item.code, item.capacity, item.type));
+    //preData.classes.forEach(item => addExistingRow(item.code, item.capacity, item.type));
     addClassBtn.addEventListener('click', () => {
         addNewClassRow('', '', '');
     });
