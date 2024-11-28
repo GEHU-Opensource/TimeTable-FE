@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
     })
     .then(item => {
-        addExistingRow(item.code, item.capacity, item.type);
+        addExistingRow(item.id, item.room_code, item.capacity, item.room_type);
     })
     .catch(error => {
         console.log("Error: ",error);
@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addExistingRow(code, capacity, type) {
         const row = document.createElement('tr');
+        row.dataset.rowId = classItem.id;
         row.innerHTML = `
             <td><input type="text" value="${code}" disabled></td>
             <td><input type="number" min="0" value="${capacity}" disabled></td>
