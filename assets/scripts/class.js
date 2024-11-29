@@ -1,212 +1,244 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const existingClassTableBody = document.querySelector('#existingClassTable tbody');
-    const newClassTableBody = document.querySelector('#classTable tbody');
-    const addClassBtn = document.getElementById('addClassBtn');
-    const submitClassBtn = document.getElementById('submitClassBtn');
-    const baseurl = "http://127.0.0.1:8000";
-    
-    fetch(`${baseurl}/getRooms/`, {
-        method: "GET",
+document.addEventListener("DOMContentLoaded", () => {
+  const existingClassTableBody = document.querySelector(
+    "#existingClassTable tbody"
+  );
+  const newClassTableBody = document.querySelector("#classTable tbody");
+  const addClassBtn = document.getElementById("addClassBtn");
+  const submitClassBtn = document.getElementById("submitClassBtn");
+  const baseUrl = "http://127.0.0.1:8000";
+
+  // Fetch and display existing rooms
+  fetchRooms();
+
+  addClassBtn.addEventListener("click", () => {
+    addNewClassRow("", "", "");
+  });
+
+  submitClassBtn.addEventListener("click", handleSubmitClasses);
+
+  function fetchRooms() {
+    fetch(`${baseUrl}/getRooms/`, {
+      method: "GET",
     })
-    .then(response => {
-        if(!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
-    })
-    .then(item => {
-        addExistingRow(item.code, item.capacity, item.type);
-    })
-    .catch(error => {
-        console.log("Error: ",error);
-        alert("System Failure");
-    });
-
-    //preData.classes.forEach(item => addExistingRow(item.code, item.capacity, item.type));
-    addClassBtn.addEventListener('click', () => {
-        addNewClassRow('', '', '');
-    });
-    
-    submitClassBtn.addEventListener('click', () => {
-        const rows = newClassTableBody.querySelectorAll('tr');
-        const data = [];
-        rows.forEach(row => {
-            const code = row.querySelector('.class-code').value.trim();
-            const capacity = row.querySelector('.class-capacity').value.trim();
-            const type = row.querySelector('.class-type').value;
-            if(code && capacity && type) {
-                data.push({ code, capacity, type });
-                alert("Check the Console!");
-                console.log('New Class Data:', data);
-            }
-            else {
-                alert("Please fill the Class Details!");
-            }
-        });
-        /*
-        if (data.length > 0) {
-            fetch("api", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json", // Inform the server about the JSON format
-                },
-                body: JSON.stringify(data), // Convert the array of objects to a JSON string
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json(); // Parse the JSON response
-                })
-                .then(serverResponse => {
-                    console.log("Server Response:", serverResponse);
-                    alert("Classes added successfully!");
-                })
-                .catch(error => {
-                    console.error("Error adding classes:", error);
-                    alert("Failed to add classes. Please try again.");
-                });
+      })
+      .then((rooms) => {
+        if (Array.isArray(rooms)) {
+          rooms.forEach((room) =>
+            addExistingRow(
+              room.id,
+              room.room_code,
+              room.capacity,
+              room.room_type
+            )
+          );
+        } else {
+          console.log("No rooms found");
         }
-        else {
-            console.log("No valid data to send.");
-        }*/
+      })
+      .catch((error) => {
+        console.error("Error fetching rooms:", error);
+        alert("Failed to fetch rooms. Please try again.");
+      });
+  }
+
+  function handleSubmitClasses() {
+    const rows = newClassTableBody.querySelectorAll("tr");
+    const roomData = [];
+
+    rows.forEach((row) => {
+      const data = {
+        room_code: row.querySelector(".class-code").value.trim(),
+        capacity: row.querySelector(".class-capacity").value.trim(),
+        room_type: row.querySelector(".class-type").value.trim(),
+      };
+
+      if (validateRoomData(data)) {
+        roomData.push(data);
+      }
     });
 
-    function addExistingRow(code, capacity, type) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><input type="text" value="${code}" disabled></td>
-            <td><input type="number" min="0" value="${capacity}" disabled></td>
-            <td>
-                <select disabled>
-                    <option value="lt" ${type === 'lt' ? 'selected' : ''}>LT</option>
-                    <option value="cr" ${type === 'cr' ? 'selected' : ''}>CR</option>
-                    <option value="lab" ${type === 'lab' ? 'selected' : ''}>Lab</option>
-                </select>
-            </td>
-            <td>
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-            </td>
-        `;
-        const editBtn = row.querySelector('.edit-btn');
-        const deleteBtn = row.querySelector('.delete-btn');
-        const inputs = row.querySelectorAll('input, select');
-
-        editBtn.addEventListener('click', () => {
-            const oldCode = inputs[0].value.trim(); // Store the old code before editing
-        
-            if (editBtn.textContent === 'Edit') {
-                // Enable input fields for editing
-                inputs.forEach(input => input.disabled = false);
-                editBtn.textContent = 'Save';
-            } else {
-                // Disable inputs after saving
-                inputs.forEach(input => input.disabled = true);
-        
-                // Validate inputs
-                if (inputs[0].value.trim() !== "" && inputs[1].value.trim() !== "" && inputs[2].value.trim() !== "") {
-                    // Prepare data for the API call
-                    const classData = {
-                        code: inputs[0].value.trim(),
-                        capacity: inputs[1].value.trim(),
-                        type: inputs[2].value.trim(),
-                    };
-                    console.log(classData);
-                    /*
-                    fetch(`api/${oldCode}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json", // Indicate JSON data format
-                        },
-                        body: JSON.stringify(classData), // Convert object to JSON string
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.json(); // Parse JSON response
-                        })
-                        .then(updatedData => {
-                            console.log("Updated data from server:", updatedData);
-                            alert("Class details updated successfully!");
-                            editBtn.textContent = 'Edit';
-                        })
-                        .catch(error => {
-                            console.error("Error updating class details:", error);
-                            alert("Failed to update class details. Please try again.");
-                            // Re-enable inputs for correction in case of failure
-                            inputs.forEach(input => input.disabled = false);
-                        });*/
-                        
-                    editBtn.textContent = 'Edit';
-                }
-                else {
-                    alert("Please fill the Class Details!");
-                    inputs.forEach(input => input.disabled = false); // Re-enable inputs for correction
-                    return;
-                }
-            }
-        });        
-
-        deleteBtn.addEventListener('click', () => {
-            let result = confirm("Are you sure to Delete?");
-            if(result) {
-                const inputs = row.querySelectorAll('input, select');
-                row.remove();
-                /*
-                fetch(`api/${inputs[0].value.trim()}`, {
-                    method: "DELETE", // Use the HTTP DELETE method
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json(); // Parse JSON response if needed
-                })
-                .then(data => {
-                    console.log("Deletion successful:", data);
-                    alert("Item deleted successfully!");
-                })
-                .catch(error => {
-                    console.error("Error deletingitem:", error);
-                    alert("Failed to delete item. Please try again.");
-                });*/
-            }
-            else {
-                return ;
-            }
+    if (roomData.length > 0) {
+      fetch(`${baseUrl}/addRoom/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(roomData),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((errorData) => {
+              throw new Error(
+                errorData.error || `HTTP error! Status: ${response.status}`
+              );
+            });
+          }
+          return response.json();
+        })
+        .then((response) => {
+          console.log("Server response:", response);
+          alert("Rooms added successfully!");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error adding rooms:", error);
+          alert(error.message || "Failed to add rooms. Please try again.");
         });
-        existingClassTableBody.appendChild(row);
+    } else {
+      alert("Please fill in all required fields before submitting!");
     }
+  }
 
-    function addNewClassRow(code, capacity, type) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><input type="text" class="class-code" value="${code}" placeholder="Enter Class Code"></td>
-            <td><input type="number" min="0" class="class-capacity" value="${capacity}" placeholder="Enter Class Code"></td>
-            <td>
-                <select class="class-type">
-                    <option value="">Select Type</option>
-                    <option value="lt" ${type === 'lt' ? 'selected' : ''}>LT</option>
-                    <option value="cr" ${type === 'cr' ? 'selected' : ''}>CR</option>
-                    <option value="lab" ${type === 'lab' ? 'selected' : ''}>Lab</option>
-                </select>
-            </td>
-            <td>
-                <button class="delete-btn">Delete</button>
-            </td>
-        `;
-        const deleteBtn = row.querySelector('.delete-btn');
-        deleteBtn.addEventListener('click', () => {
-            let result = confirm("Are you sure to Delete?");
-            if(result) {
-                row.remove();
-            }
-            else {
-                return ;
-            }
-        });
-        newClassTableBody.appendChild(row);
+  function validateRoomData(data) {
+    if (!data.room_code || !data.capacity || !data.room_type) {
+      alert("All fields (room code, capacity, and room type) are required.");
+      return false;
     }
+    if (isNaN(data.capacity) || parseInt(data.capacity) <= 0) {
+      alert("Capacity must be a valid positive number.");
+      return false;
+    }
+    return true;
+  }
+
+  function addExistingRow(id, code, capacity, type) {
+    const row = document.createElement("tr");
+    row.dataset.rowId = id;
+
+    row.innerHTML = `
+        <td><input type="text" value="${code}" disabled></td>
+        <td><input type="number" min="0" value="${capacity}" disabled></td>
+        <td>
+          <select disabled>
+            ${generateRoomTypeOptions(type)}
+          </select>
+        </td>
+        <td>
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </td>
+      `;
+
+    const editBtn = row.querySelector(".edit-btn");
+    const deleteBtn = row.querySelector(".delete-btn");
+    const inputs = row.querySelectorAll("input, select");
+
+    editBtn.addEventListener("click", () => handleEditRow(editBtn, inputs, id));
+    deleteBtn.addEventListener("click", () => handleDeleteRow(row, id));
+
+    existingClassTableBody.appendChild(row);
+  }
+  
+  // Update a room's Details
+  function handleEditRow(editBtn, inputs, rowId) {
+    if (editBtn.textContent === "Edit") {
+      // Enable editing
+      inputs.forEach((input) => (input.disabled = false));
+      editBtn.textContent = "Save";
+    } else {
+      const data = {
+        room_code: inputs[0].value.trim(),
+        capacity: inputs[1].value.trim(),
+        room_type: inputs[2].value.trim(),
+      };
+
+      if (!validateRoomData(data)) {
+        inputs.forEach((input) => (input.disabled = false)); // Re-enable inputs for correction
+        return;
+      }
+
+      fetch(`${baseUrl}/updateRoom/${rowId}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((errorData) => {
+              throw new Error(
+                errorData.error || `HTTP error! Status: ${response.status}`
+              );
+            });
+          }
+          return response.json();
+        })
+        .then((updatedData) => {
+          console.log("Updated room:", updatedData);
+          alert("Room updated successfully!");
+          editBtn.textContent = "Edit";
+          inputs.forEach((input) => (input.disabled = true));
+        })
+        .catch((error) => {
+          console.error("Error updating room:", error);
+          alert(error.message || "Failed to update room details.");
+        });
+    }
+  }
+
+  function handleDeleteRow(row, rowId) {
+    if (confirm("Are you sure you want to delete this room?")) {
+      fetch(`${baseUrl}/deleteRoom/${rowId}/`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(() => {
+          row.remove();
+          alert("Room deleted successfully!");
+        })
+        .catch((error) => {
+          console.error("Error deleting room:", error);
+          alert("Failed to delete room. Please try again.");
+        });
+    }
+  }
+
+  function addNewClassRow(code, capacity, type) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td><input type="text" class="class-code" value="${code}" placeholder="Enter Room Code"></td>
+        <td><input type="number" min="0" class="class-capacity" value="${capacity}" placeholder="Enter Room Capacity"></td>
+        <td>
+          <select class="class-type">
+            ${generateRoomTypeOptions(type)}
+          </select>
+        </td>
+        <td>
+          <button class="delete-btn">Delete</button>
+        </td>
+      `;
+
+    const deleteBtn = row.querySelector(".delete-btn");
+    deleteBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to delete this entry?")) {
+        row.remove();
+      }
+    });
+
+    newClassTableBody.appendChild(row);
+  }
+
+  function generateRoomTypeOptions(selectedType) {
+    const roomTypes = ["Lecture Theatre", "Class Room", "Lab", "Seminar Hall"];
+    return roomTypes
+      .map(
+        (type) =>
+          `<option value="${type}" ${
+            type === selectedType ? "selected" : ""
+          }>${type}</option>`
+      )
+      .join("");
+  }
 });
