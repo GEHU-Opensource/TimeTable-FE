@@ -81,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return response.json();
         })
         .then((response) => {
-          console.log("Server response:", response);
           alert("Rooms added successfully!");
           window.location.reload();
         })
@@ -133,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     existingClassTableBody.appendChild(row);
   }
-  
+
   // Update a room's Details
   function handleEditRow(editBtn, inputs, rowId) {
     if (editBtn.textContent === "Edit") {
@@ -170,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return response.json();
         })
         .then((updatedData) => {
-          console.log("Updated room:", updatedData);
           alert("Room updated successfully!");
           editBtn.textContent = "Edit";
           inputs.forEach((input) => (input.disabled = true));
