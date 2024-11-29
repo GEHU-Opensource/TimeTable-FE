@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitClassBtn = document.getElementById("submitClassBtn");
   const baseUrl = "http://127.0.0.1:8000";
 
-  // Fetch and display existing rooms
   fetchRooms();
 
   addClassBtn.addEventListener("click", () => {
@@ -73,20 +72,47 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((response) => {
           if (!response.ok) {
             return response.json().then((errorData) => {
-              throw new Error(
-                errorData.error || `HTTP error! Status: ${response.status}`
-              );
+              throw errorData;
             });
           }
           return response.json();
         })
         .then((response) => {
-          alert("Rooms added successfully!");
+          let successMessage = "Rooms added successfully!";
+          let errorMessage = "";
+
+          if (response.errors && response.errors.length > 0) {
+            errorMessage =
+              "Failed to add the following rooms due to existing room codes:\n";
+            response.errors.forEach((error) => {
+              errorMessage += `Room code: ${error.room_data.room_code} - ${error.error}\n`;
+            });
+          }
+
+          if (response.added_rooms && response.added_rooms.length > 0) {
+            successMessage += `\nSuccessfully added the following rooms:\n`;
+            response.added_rooms.forEach((room) => {
+              successMessage += `Room code: ${room.room_code}, Capacity: ${room.capacity}, Type: ${room.room_type}\n`;
+            });
+          }
+
+          if (errorMessage) {
+            alert(errorMessage);
+          } else {
+            alert(successMessage);
+          }
+
           window.location.reload();
         })
         .catch((error) => {
           console.error("Error adding rooms:", error);
-          alert(error.message || "Failed to add rooms. Please try again.");
+          if (error && error.errors) {
+            alert(`Error: ${error.errors.map((err) => err.error).join(", ")}`);
+          } else if (error && error.message) {
+            alert(`Error: ${error.message}`);
+          } else {
+            alert("Failed to add rooms. Please try again.");
+          }
         });
     } else {
       alert("Please fill in all required fields before submitting!");
@@ -133,10 +159,8 @@ document.addEventListener("DOMContentLoaded", () => {
     existingClassTableBody.appendChild(row);
   }
 
-  // Update a room's Details
   function handleEditRow(editBtn, inputs, rowId) {
     if (editBtn.textContent === "Edit") {
-      // Enable editing
       inputs.forEach((input) => (input.disabled = false));
       editBtn.textContent = "Save";
     } else {
@@ -147,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       if (!validateRoomData(data)) {
-        inputs.forEach((input) => (input.disabled = false)); // Re-enable inputs for correction
+        inputs.forEach((input) => (input.disabled = false));
         return;
       }
 
