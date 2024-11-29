@@ -1,28 +1,18 @@
-const subjects = [
-  "Mathematics",
-  "Physics",
-  "Chemistry",
-  "Computer Science",
-  "Data Structures",
-  "Algorithms",
-  "Machine Learning",
-];
-
 const departments = [
   {
-    name: "Computer Science Engineering",
+    name: "CSE",
     courses: [
       {
         name: "B.Tech",
         branches: [
           {
-            name: "CSE",
+            name: "Core",
             years: [
               {
                 year: "1st Year",
                 semesters: [
                   {
-                    sem: "Semester 1",
+                    sem: "5",
                     timetable: ["test1.xlsx"],
                     subjects: [
                       {
@@ -143,13 +133,5 @@ const departments = [
   },
   // Add more departments here if needed
 ];
-
-const preData = {
-  classes: [
-    { code: "C101", capacity: "50", type: "Lecture Theatre" },
-    { code: "C102", capacity: "30", type: "cr" },
-    { code: "C103", capacity: "25", type: "lab" },
-  ],
-};
 
 const generateTT = "testing.xlsx";
