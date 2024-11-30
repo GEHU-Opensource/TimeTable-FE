@@ -1,22 +1,42 @@
-document.getElementById('admin-login-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent form from refreshing the page
-    
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errorMessage = document.getElementById('error-message');
-    sessionStorage.setItem("isLoggedin","false");
-    // Hardcoded credentials for demonstration
-    const adminUsername = 'admin123';
-    const adminPassword = 'Admin@123';
-    sessionStorage.setItem("isLoggedin","false");
-    if (username === adminUsername && password === adminPassword) {
-        sessionStorage.setItem("isLoggedin","true");
-        alert('Login successful!');
-        window.location.href = 'subject.html'; 
-        username.value = "";
-        password.textContent = "";
-    } else {
-        errorMessage.textContent = 'Invalid username or password.';
-        errorMessage.style.display = 'block';
+const form = document.getElementById('admin-login-form');
+const usernameField = document.getElementById('username');
+const passwordField = document.getElementById('password');
+const errorMessage = document.getElementById('error-message');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const username = usernameField.value;
+    const password = passwordField.value;
+
+    if (!username || !password) {
+        errorMessage.textContent = "Username and password are required!";
+        return;
+    }
+
+    try {
+        const response = await fetch('https://reqres.in/api/login/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: username,
+                password: password,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('access', data.token);
+            const expirationTime = Date.now() + 3600000;
+            localStorage.setItem('sessionExpiresAt', expirationTime);
+            window.location.href = '../admin/subject.html';
+        } else {
+            errorMessage.textContent = data.error || "Login failed. Please try again.";
+        }
+    } catch (error) {
+        errorMessage.textContent = "An error occurred. Please try again later.";
     }
 });

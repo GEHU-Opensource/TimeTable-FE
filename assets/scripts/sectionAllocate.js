@@ -9,6 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const timetable = document.getElementById("show");
     const fileInput = document.getElementById('tt');
     const fileChosen = document.getElementById('file-chosen');
+    const logoutBtn = document.querySelector(".logout-btn");
+      logoutBtn.addEventListener("click", () => {
+          localStorage.clear();
+          window.location.href = "../login.html";
+      });
 
     fileInput.addEventListener('change', () => {
         fileChosen.textContent = fileInput.files[0]?.name || "No file chosen";

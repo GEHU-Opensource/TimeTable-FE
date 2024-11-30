@@ -4,22 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subject Details</title>
-    <link rel="stylesheet" href="assets/styles/subject.css">
-    <script src="assets/scripts/data.js"></script>
-    <script src="assets/scripts/subject.js"></script>
+    <link rel="stylesheet" href="../assets/styles/subject.css">
+    <script>
+        function validateSession() {
+            const token = localStorage.getItem("access");
+            const expirationTime = localStorage.getItem("sessionExpiresAt");
+            if (!token || !expirationTime) {
+                alert("You are not authorized! Redirecting to login.");
+                localStorage.clear();
+                window.location.href = "../login.html";
+                return false;
+            }
+            const currentTime = Date.now();
+            if (currentTime >= expirationTime) {
+                alert("Session expired! Redirecting to login.");
+                localStorage.clear();
+                window.location.href = "../login.html";
+                return false;
+            }
+            startTimer(expirationTime);
+            return true;
+        }
+        validateSession();
+        function startTimer(expirationTime) {
+            const timer = setInterval(() => {
+                const currentTime = Date.now();
+                if (currentTime >= expirationTime) {
+                    alert("Session Expired!")
+                    clearInterval(timer);
+                    localStorage.removeItem('access');
+                    localStorage.removeItem('sessionExpiresAt');
+                    window.location.href = '../login.html';
+                }
+            }, 1000);
+        }
+    </script>
+    <script src="../assets/scripts/data.js"></script>
+    <script type="module" src="../assets/scripts/subject.js"></script>
 </head>
 <body>
     <header>
-        <img src="assets/images/logo.png" alt="logo">
+        <img src="../assets/images/logo.png" alt="logo">
         <nav>
             <ul>
-                <li><a href="subject.html">Subject Details</a></li>
-                <li><a href="class.html">Class Details</a></li>
-                <li><a href="generateTT.html">Generate TT</a></li>
-                <li><a href="updateTT.html">Manual Update TT</a></li>
-                <li><a href="viewTT.html">View TT</a></li>
-                <li><a href="sectionAllocate.html">Section Allocate</a></li>
-            </ul>
+                <li><a href="/admin/subject.html">Subject Details</a></li>
+                <li><a href="/admin/class.html">Class Details</a></li>
+                <li><a href="/admin/generateTT.html">Generate TT</a></li>
+                <li><a href="/admin/updateTT.html">Manual Update TT</a></li>
+                <li><a href="/admin/viewTT.html">View TT</a></li>
+                <li><a href="/admin/sectionAllocate.html">Section Allocate</a></li>
+            </ul>   
         </nav>
         <button class="logout-btn">Logout</button>
     </header>

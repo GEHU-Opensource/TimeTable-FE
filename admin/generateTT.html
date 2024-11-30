@@ -3,30 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View TimeTable</title>
-    <link rel="stylesheet" href="assets/styles/viewTT.css">
+    <title>Generate TimeTable</title>
+    <link rel="stylesheet" href="../assets/styles/generateTT.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        function validateSession() {
+            const token = localStorage.getItem("access");
+            const expirationTime = localStorage.getItem("sessionExpiresAt");
+            if (!token || !expirationTime) {
+                alert("You are not authorized! Redirecting to login.");
+                localStorage.clear();
+                window.location.href = "../login.html";
+                return false;
+            }
+            const currentTime = Date.now();
+            if (currentTime >= expirationTime) {
+                alert("Session expired! Redirecting to login.");
+                localStorage.clear();
+                window.location.href = "../login.html";
+                return false;
+            }
+            startTimer(expirationTime);
+            return true;
+        }
+        validateSession();
+        function startTimer(expirationTime) {
+            const timer = setInterval(() => {
+                const currentTime = Date.now();
+                if (currentTime >= expirationTime) {
+                    alert("Session Expired!")
+                    clearInterval(timer);
+                    localStorage.removeItem('access');
+                    localStorage.removeItem('sessionExpiresAt');
+                    window.location.href = '../login.html';
+                }
+            }, 1000);
+        }
+    </script>
 
 </head>
 <body>
     <header>
-        <img src="assets/images/logo.png" alt="logo">
+        <img src="../assets/images/logo.png" alt="logo">
         <nav>
             <ul>
-                <li><a href="subject.html">Subject Details</a></li>
-                <li><a href="class.html">Class Details</a></li>
-                <li><a href="generateTT.html">Generate TT</a></li>
-                <li><a href="updateTT.html">Manual Update TT</a></li>
-                <li><a href="viewTT.html">View TT</a></li>
-                <li><a href="sectionAllocate.html">Section Allocate</a></li>
-            </ul>
+                <li><a href="/admin/subject.html">Subject Details</a></li>
+                <li><a href="/admin/class.html">Class Details</a></li>
+                <li><a href="/admin/generateTT.html">Generate TT</a></li>
+                <li><a href="/admin/updateTT.html">Manual Update TT</a></li>
+                <li><a href="/admin/viewTT.html">View TT</a></li>
+                <li><a href="/admin/sectionAllocate.html">Section Allocate</a></li>
+            </ul>   
         </nav>
         <button class="logout-btn">Logout</button>
     </header>
 
     <main>
         <div class="form-container">
-            <h2>View TimeTable</h2>
+            <h2>Generate TimeTable</h2>
             <form action="" id="subjectDetailsform">
                 <div class="form-group">
                     <label for="department">Department *</label>
@@ -64,13 +98,13 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="button" id="viewTT">View TT</button>
+                    <button type="button" id="generateTT">Generate TT</button>
                 </div>
             </form>
         </div>
 
         <div class="show" id="show">
-            <h1>View TimeTable</h1>
+            <h1>Generated TimeTable</h1>
             <label for="sheet-selector">Section:</label>
             <select id="sheet-selector"></select>
             <button id="download-btn">Download</button>
@@ -79,7 +113,7 @@
         </div>
     </main>
 
-    <script src="assets/scripts/data.js"></script>
-    <script src="assets/scripts/viewTT.js"></script>
+    <script src="../assets/scripts/data.js"></script>
+    <script src="../assets/scripts/generateTT.js"></script>
 </body>
 </html>

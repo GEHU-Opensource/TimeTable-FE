@@ -6,6 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const addClassBtn = document.getElementById("addClassBtn");
   const submitClassBtn = document.getElementById("submitClassBtn");
   const baseUrl = "http://127.0.0.1:8000";
+  const logoutBtn = document.querySelector(".logout-btn");
+    logoutBtn.addEventListener("click", () => {
+        localStorage.clear();
+        window.location.href = "../login.html";
+    });
 
   fetchRooms();
 
@@ -257,8 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return roomTypes
       .map(
         (type) =>
-          `<option value="${type}" ${
-            type === selectedType ? "selected" : ""
+          `<option value="${type}" ${type === selectedType ? "selected" : ""
           }>${type}</option>`
       )
       .join("");

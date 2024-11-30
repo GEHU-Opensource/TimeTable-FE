@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Details</title>
+    <link rel="stylesheet" href="../assets/styles/class.css">
+    <script>
+        function validateSession() {
+            const token = localStorage.getItem("access");
+            const expirationTime = localStorage.getItem("sessionExpiresAt");
+            if (!token || !expirationTime) {
+                alert("You are not authorized! Redirecting to login.");
+                localStorage.clear();
+                window.location.href = "../login.html";
+                return false;
+            }
+            const currentTime = Date.now();
+            if (currentTime >= expirationTime) {
+                alert("Session expired! Redirecting to login.");
+                localStorage.clear();
+                window.location.href = "../login.html";
+                return false;
+            }
+            startTimer(expirationTime);
+            return true;
+        }
+        validateSession();
+        function startTimer(expirationTime) {
+            const timer = setInterval(() => {
+                const currentTime = Date.now();
+                if (currentTime >= expirationTime) {
+                    alert("Session Expired!")
+                    clearInterval(timer);
+                    localStorage.removeItem('access');
+                    localStorage.removeItem('sessionExpiresAt');
+                    window.location.href = '../login.html';
+                }
+            }, 1000);
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <img src="../assets/images/logo.png" alt="logo">
+        <nav>
+            <ul>
+                <li><a href="/admin/subject.html">Subject Details</a></li>
+                <li><a href="/admin/class.html">Class Details</a></li>
+                <li><a href="/admin/generateTT.html">Generate TT</a></li>
+                <li><a href="/admin/updateTT.html">Manual Update TT</a></li>
+                <li><a href="/admin/viewTT.html">View TT</a></li>
+                <li><a href="/admin/sectionAllocate.html">Section Allocate</a></li>
+            </ul>   
+        </nav>
+        <button class="logout-btn">Logout</button>
+    </header>
+
+    <main>
+        <!-- Existing Class Data Container -->
+        <section id="existingClassData">
+            <h2>Existing Class Data</h2>
+            <table id="existingClassTable">
+                <thead>
+                    <tr>
+                        <th>Class Code</th>
+                        <th>Capacity</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows added dynamically -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Add New Class Container -->
+        <section id="newClassData">
+            <h2>Add New Class</h2>
+            <div class="action-section">
+                <button id="addClassBtn">Add Class</button>
+                <button id="submitClassBtn">Submit</button>
+            </div>
+            <table id="classTable">
+                <thead>
+                    <tr>
+                        <th>Class Code</th>
+                        <th>Capacity</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows added dynamically -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script src="../assets/scripts/data.js"></script>
+    <script src="../assets/scripts/class.js"></script>
+</body>
+</html>

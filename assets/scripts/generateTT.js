@@ -7,6 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const generateButton = document.getElementById("generateTT");
     const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
+    const logoutBtn = document.querySelector(".logout-btn");
+      logoutBtn.addEventListener("click", () => {
+          localStorage.clear();
+          window.location.href = "../login.html";
+      });
 
     /*fetch("api", {
         method: "GET",
