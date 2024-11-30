@@ -1,42 +1,48 @@
-const form = document.getElementById('admin-login-form');
-const usernameField = document.getElementById('username');
-const passwordField = document.getElementById('password');
-const errorMessage = document.getElementById('error-message');
+const apiUrl = "http://127.0.0.1:8000/api/token/";
 
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+// Get elements from the DOM
+const loginForm = document.getElementById("admin-login-form");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const errorMessage = document.getElementById("error-message");
 
-    const username = usernameField.value;
-    const password = passwordField.value;
+// Event listener for form submission
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    if (!username || !password) {
-        errorMessage.textContent = "Username and password are required!";
-        return;
+  const username = usernameInput.value;
+  const password = passwordInput.value;
+
+  if (!username || !password) {
+    errorMessage.textContent = "Please fill out all fields.";
+    return;
+  }
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
+
+      const expirationTime = Date.now() + 2 * 60 * 60 * 1000;
+      localStorage.setItem("sessionExpiresAt", expirationTime);
+
+      // Redirect to a different page upon successful login
+      window.location.href = "../admin/subject.html";
+    } else {
+      errorMessage.textContent = data.detail || "Invalid credentials.";
     }
-
-    try {
-        const response = await fetch('https://reqres.in/api/login/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: username,
-                password: password,
-            }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            localStorage.setItem('access', data.token);
-            const expirationTime = Date.now() + 3600000;
-            localStorage.setItem('sessionExpiresAt', expirationTime);
-            window.location.href = '../admin/subject.html';
-        } else {
-            errorMessage.textContent = data.error || "Login failed. Please try again.";
-        }
-    } catch (error) {
-        errorMessage.textContent = "An error occurred. Please try again later.";
-    }
+  } catch (error) {
+    console.error("Error:", error);
+    errorMessage.textContent = "An error occurred. Please try again later.";
+  }
 });

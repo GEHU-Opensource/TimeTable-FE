@@ -7,10 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitClassBtn = document.getElementById("submitClassBtn");
   const baseUrl = "http://127.0.0.1:8000";
   const logoutBtn = document.querySelector(".logout-btn");
-    logoutBtn.addEventListener("click", () => {
-        localStorage.clear();
-        window.location.href = "../login.html";
-    });
+  logoutBtn.addEventListener("click", () => {
+    localStorage.clear();
+    window.location.href = "../login.html";
+  });
 
   fetchRooms();
 
@@ -19,10 +19,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   submitClassBtn.addEventListener("click", handleSubmitClasses);
-
   function fetchRooms() {
+    const token = localStorage.getItem("access_token");
     fetch(`${baseUrl}/getRooms/`, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     })
       .then((response) => {
         if (!response.ok) {
@@ -67,9 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (roomData.length > 0) {
+      const token = localStorage.getItem("access_token");
       fetch(`${baseUrl}/addRoom/`, {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(roomData),
@@ -179,10 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
         inputs.forEach((input) => (input.disabled = false));
         return;
       }
-
+      const token = localStorage.getItem("access_token");
       fetch(`${baseUrl}/updateRoom/${rowId}/`, {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
@@ -211,8 +218,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleDeleteRow(row, rowId) {
     if (confirm("Are you sure you want to delete this room?")) {
+      const token = localStorage.getItem("access_token");
       fetch(`${baseUrl}/deleteRoom/${rowId}/`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       })
         .then((response) => {
           if (!response.ok) {
@@ -262,7 +274,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return roomTypes
       .map(
         (type) =>
-          `<option value="${type}" ${type === selectedType ? "selected" : ""
+          `<option value="${type}" ${
+            type === selectedType ? "selected" : ""
           }>${type}</option>`
       )
       .join("");

@@ -145,6 +145,9 @@ function gatherFormData(selectedSubjects) {
 }
 
 function submitFormData(data) {
+  // Show loading indicator
+  document.getElementById("loading-spinner").style.display = "block";
+
   fetch(`${baseUrl}/addTeacher/`, {
     method: "POST",
     headers: {
@@ -152,14 +155,40 @@ function submitFormData(data) {
     },
     body: JSON.stringify(data),
   })
-    .then(handleResponse)
-    .then(() => {
-      alert("Data submitted successfully!");
+    .then((response) => {
+      if (!response.ok) {
+        return response.json().then((errorData) => {
+          throw new Error(
+            errorData.error || `HTTP error! Status: ${response.status}`
+          );
+        });
+      }
+      return response.json();
+    })
+    .then((responseData) => {
+      // Hide the loading spinner
+      document.getElementById("loading-spinner").style.display = "none";
+
+      // Handle success
+      if (responseData.message) {
+        alert(responseData.message); // Show success message from backend
+      }
+
+      // Reset form fields and hide selected subjects container
       form.reset();
       selectedSubjectsContainer.style.display = "none";
     })
     .catch((error) => {
+      // Hide the loading spinner in case of an error
+      document.getElementById("loading-spinner").style.display = "none";
+
+      // Display error messages from response
+      if (error.message.includes("Teacher with this email already exists.")) {
+        alert("This teacher's email already exists. Please try again.");
+      } else {
+        alert("Failed to submit data. Please try again.");
+      }
+
       console.error("Error posting data:", error);
-      alert("Failed to submit data. Please try again.");
     });
 }

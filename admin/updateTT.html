@@ -1,117 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manual Update TimeTable</title>
-    <link rel="stylesheet" href="../assets/styles/updateTT.css">
+    <link rel="stylesheet" href="../assets/styles/updateTT.css" />
     <script>
-        function validateSession() {
-            const token = localStorage.getItem("access");
-            const expirationTime = localStorage.getItem("sessionExpiresAt");
-            if (!token || !expirationTime) {
-                alert("You are not authorized! Redirecting to login.");
-                localStorage.clear();
-                window.location.href = "../login.html";
-                return false;
-            }
-            const currentTime = Date.now();
-            if (currentTime >= expirationTime) {
-                alert("Session expired! Redirecting to login.");
-                localStorage.clear();
-                window.location.href = "../login.html";
-                return false;
-            }
-            startTimer(expirationTime);
-            return true;
+      function validateSession() {
+        const accessToken = localStorage.getItem("access_token");
+        const refreshToken = localStorage.getItem("refresh_token");
+        const expirationTime = localStorage.getItem("sessionExpiresAt");
+
+        // If either token is missing, redirect to login
+        if (!accessToken || !refreshToken || !expirationTime) {
+          alert("You are not authorized! Redirecting to login.");
+          localStorage.clear();
+          window.location.href = "../login.html";
+          return false;
         }
-        validateSession();
-        function startTimer(expirationTime) {
-            const timer = setInterval(() => {
-                const currentTime = Date.now();
-                if (currentTime >= expirationTime) {
-                    alert("Session Expired!")
-                    clearInterval(timer);
-                    localStorage.removeItem('access');
-                    localStorage.removeItem('sessionExpiresAt');
-                    window.location.href = '../login.html';
-                }
-            }, 1000);
+
+        const currentTime = Date.now();
+        // If the access token is expired, attempt to refresh it
+        if (currentTime >= expirationTime) {
+          refreshAccessToken(refreshToken);
+          return false;
         }
+
+        startTimer(expirationTime);
+        return true;
+      }
+
+      function refreshAccessToken(refreshToken) {
+        fetch("http://127.0.0.1:8000/api/token/refresh/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.access) {
+              // Update access token and expiration time
+              localStorage.setItem("access_token", data.access);
+              const expirationTime = Date.now() + 60 * 60 * 1000; // 1 hour expiration
+              localStorage.setItem("sessionExpiresAt", expirationTime);
+              alert("Session refreshed!");
+              // Retry validation after refreshing
+              validateSession();
+            } else {
+              alert("Session expired! Redirecting to login.");
+              localStorage.clear();
+              window.location.href = "../login.html";
+            }
+          })
+          .catch((error) => {
+            console.error("Error refreshing access token:", error);
+            alert("Session expired! Redirecting to login.");
+            localStorage.clear();
+            window.location.href = "../login.html";
+          });
+      }
+
+      function startTimer(expirationTime) {
+        const timer = setInterval(() => {
+          const currentTime = Date.now();
+          if (currentTime >= expirationTime) {
+            alert("Session Expired!");
+            clearInterval(timer);
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("sessionExpiresAt");
+            window.location.href = "../login.html";
+          }
+        }, 1000);
+      }
+
+      validateSession();
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <img src="../assets/images/logo.png" alt="logo">
-        <nav>
-            <ul>
-                <li><a href="/admin/subject.html">Subject Details</a></li>
-                <li><a href="/admin/class.html">Class Details</a></li>
-                <li><a href="/admin/generateTT.html">Generate TT</a></li>
-                <li><a href="/admin/updateTT.html">Manual Update TT</a></li>
-                <li><a href="/admin/viewTT.html">View TT</a></li>
-                <li><a href="/admin/sectionAllocate.html">Section Allocate</a></li>
-            </ul>   
-        </nav>
-        <button class="logout-btn">Logout</button>
+      <img src="../assets/images/logo.png" alt="logo" />
+      <nav>
+        <ul>
+          <li><a href="/admin/subject.html">Subject Details</a></li>
+          <li><a href="/admin/class.html">Class Details</a></li>
+          <li><a href="/admin/generateTT.html">Generate TT</a></li>
+          <li><a href="/admin/updateTT.html">Manual Update TT</a></li>
+          <li><a href="/admin/viewTT.html">View TT</a></li>
+          <li><a href="/admin/sectionAllocate.html">Section Allocate</a></li>
+        </ul>
+      </nav>
+      <button class="logout-btn">Logout</button>
     </header>
 
     <main>
-        <div class="form-container">
-            <h2>Update TimeTable</h2>
-            <form action="" id="subjectDetailsform">
-                <div class="form-group">
-                    <label for="department">Department *</label>
-                    <select name="department" id="department" required>
-                        <option value="" selected>Select Department</option>
-                    </select>
-                </div>
+      <div class="form-container">
+        <h2>Update TimeTable</h2>
+        <form action="" id="subjectDetailsform">
+          <div class="form-group">
+            <label for="department">Department *</label>
+            <select name="department" id="department" required>
+              <option value="" selected>Select Department</option>
+            </select>
+          </div>
 
-                <div class="form-group">
-                    <label for="course">Course *</label>
-                    <select name="course" id="course" required>
-                        <option value="" selected>Select Course</option>
-                    </select>
-                </div>
+          <div class="form-group">
+            <label for="course">Course *</label>
+            <select name="course" id="course" required>
+              <option value="" selected>Select Course</option>
+            </select>
+          </div>
 
-                <div class="form-group">
-                    <label for="branch">Branch *</label>
-                    <select name="branch" id="branch" required>
-                        <option value="" selected>Select Branch</option>
-                    </select>
-                </div>
+          <div class="form-group">
+            <label for="branch">Branch *</label>
+            <select name="branch" id="branch" required>
+              <option value="" selected>Select Branch</option>
+            </select>
+          </div>
 
-                <div class="form-group">
-                    <label for="year">Year *</label>
-                    <select name="year" id="year" required>
-                        <option value="" selected>Select Year</option>
-                    </select>
-                </div>
+          <div class="form-group">
+            <label for="year">Year *</label>
+            <select name="year" id="year" required>
+              <option value="" selected>Select Year</option>
+            </select>
+          </div>
 
-                <div class="form-group">
-                    <label for="semester">Semester *</label>
-                    <select name="semester" id="semester" required>
-                        <option value="" selected>Select Semester</option>
-                    </select>
-                </div>
+          <div class="form-group">
+            <label for="semester">Semester *</label>
+            <select name="semester" id="semester" required>
+              <option value="" selected>Select Semester</option>
+            </select>
+          </div>
 
-                <div class="form-group">
-                    <label for="tt">Updated TimeTable *</label>
-                    <div class="file-input-container">
-                        <label for="tt" class="file-label">Choose File</label>
-                        <input type="file" name="tt" id="tt" accept=".xlsx, .xls">
-                        <span id="file-chosen">No file chosen</span>
-                    </div>
-                </div>
+          <div class="form-group">
+            <label for="tt">Updated TimeTable *</label>
+            <div class="file-input-container">
+              <label for="tt" class="file-label">Choose File</label>
+              <input type="file" name="tt" id="tt" accept=".xlsx, .xls" />
+              <span id="file-chosen">No file chosen</span>
+            </div>
+          </div>
 
-                <div class="form-group">
-                    <button type="button" id="updateTT">Update TT</button>
-                </div>
-            </form>
-        </div>
+          <div class="form-group">
+            <button type="button" id="updateTT">Update TT</button>
+          </div>
+        </form>
+      </div>
     </main>
 
     <script src="../assets/scripts/data.js"></script>
     <script src="../assets/scripts/updateTT.js"></script>
-</body>
+  </body>
 </html>
