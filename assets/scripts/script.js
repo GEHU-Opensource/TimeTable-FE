@@ -50,3 +50,13 @@ loginForm.addEventListener("submit", async (e) => {
     errorMessage.textContent = "An error occurred. Please try again later.";
   }
 });
+
+function togglePassword() {
+  var showPass = document.getElementById("password");
+  if(showPass.type==="password") {
+    showPass.type = "text";
+  }
+  else {
+    showPass.type = "password";
+  }
+}
