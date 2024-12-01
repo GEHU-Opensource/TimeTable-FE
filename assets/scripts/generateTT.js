@@ -90,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
         else {
             
         }
+        alert("TimeTable is Generated...Redirecting to the View Page");
+        /*
         const file = generateTT; // API:departmen/course/branch/year/semester
 
         if(typeof file !== "undefined") {
@@ -124,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         else {
             alert("Excel file path is missing in data.js.");
-        }
+        }*/
     });
 
     downloadButton.addEventListener('click', () => {
