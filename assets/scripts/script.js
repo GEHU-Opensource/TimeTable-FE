@@ -8,10 +8,11 @@ const errorMessage = document.getElementById("error-message");
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const username = usernameInput.value;
-  const password = passwordInput.value;
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
 
   if (!username || !password) {
+    alert("Please fill out all fields."); // Alert for empty fields
     errorMessage.textContent = "Please fill out all fields.";
     return;
   }
@@ -37,10 +38,15 @@ loginForm.addEventListener("submit", async (e) => {
       // Redirect to a different page upon successful login
       window.location.href = "../admin/subject.html";
     } else {
+      // Alert for invalid credentials
+      alert(data.detail || "Invalid credentials. Please try again.");
       errorMessage.textContent = data.detail || "Invalid credentials.";
     }
   } catch (error) {
     console.error("Error:", error);
+    alert(
+      "An error occurred while processing your request. Please try again later."
+    ); // Alert for server/network errors
     errorMessage.textContent = "An error occurred. Please try again later.";
   }
 });

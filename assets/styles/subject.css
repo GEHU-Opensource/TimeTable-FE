@@ -200,7 +200,7 @@ button.delete-btn {
 .action-section button {
     font-size: 1em;
     padding: 10px 20px;
-    margin: 0 10px;
+    margin: 0 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -208,6 +208,7 @@ button.delete-btn {
 }
 
 #addSubjectBtn {
+    margin-left: 0;
     background-color: #f1c40f;
     color: #fff;
 }
