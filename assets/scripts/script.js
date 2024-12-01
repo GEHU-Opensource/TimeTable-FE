@@ -1,12 +1,10 @@
 const apiUrl = "http://127.0.0.1:8000/api/token/";
 
-// Get elements from the DOM
 const loginForm = document.getElementById("admin-login-form");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const errorMessage = document.getElementById("error-message");
 
-// Event listener for form submission
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 

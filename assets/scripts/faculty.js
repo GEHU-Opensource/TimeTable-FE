@@ -56,7 +56,7 @@ function handleResponse(response) {
 
 function showError(error) {
   console.error("Error: ", error);
-  alert("System Failure");
+  alert(error);
 }
 
 function updateSelectedSubjects() {

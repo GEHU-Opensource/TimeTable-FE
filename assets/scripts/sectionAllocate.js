@@ -19,33 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fileChosen.textContent = fileInput.files[0]?.name || "No file chosen";
     });
 
-    /*fetch("api", {
-        method: "GET",
-    })
-    .then(response => {
-        if(!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(departments => {
-        if (Array.isArray(departments) && departments.length>0) {
-            departments.forEach(department => {
-                const option = document.createElement('option');
-                option.value = department.name;
-                option.textContent = department.name;
-                departmentDropdown.appendChild(option);
-            });
-        }
-        else {
-            console.error("No departments found or invalid data format.");
-        }
-    })
-    .catch(error => {
-        console.log("Error: ",error);
-        alert("System Failure");
-    });*/
-
     if(typeof departments!=='undefined') {
         departments.forEach(department => {
             const option = document.createElement('option');
