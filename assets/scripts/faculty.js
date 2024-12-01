@@ -4,7 +4,7 @@ const searchInput = document.getElementById("searchSubjects");
 const dropdownContent = document.querySelector(".dropdown-content");
 const selectedSubjectsContainer = document.querySelector(".selected-subjects");
 const subjectList = document.getElementById("subjectList");
-const baseUrl = "http://127.0.0.1:8000";
+const baseUrl = BE_URL;
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDepartments();

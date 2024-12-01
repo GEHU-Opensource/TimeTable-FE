@@ -1,4 +1,4 @@
-const apiUrl = "http://127.0.0.1:8000/api/token/";
+const apiUrl = `${BE_URL}/api/token/`;
 
 const loginForm = document.getElementById("admin-login-form");
 const usernameInput = document.getElementById("username");

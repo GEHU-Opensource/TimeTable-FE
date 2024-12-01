@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const newClassTableBody = document.querySelector("#classTable tbody");
   const addClassBtn = document.getElementById("addClassBtn");
   const submitClassBtn = document.getElementById("submitClassBtn");
-  const baseUrl = "http://127.0.0.1:8000";
+  const baseUrl = BE_URL;
   const logoutBtn = document.querySelector(".logout-btn");
   logoutBtn.addEventListener("click", () => {
     localStorage.clear();

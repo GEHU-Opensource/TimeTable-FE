@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "#subjectListTable tbody"
   );
   const newSubjectTableBody = document.querySelector("#newSubjectTable tbody");
-  const baseUrl = "http://127.0.0.1:8000";
+  const baseUrl = BE_URL;
   const addSubjectBtn = document.getElementById("addSubjectBtn");
   const submitBtn = document.getElementById("submitBtn");
   const logoutBtn = document.querySelector(".logout-btn");
