@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
           inputs.forEach((input) => (input.disabled = false));
           editButton.textContent = "Save";
         } else {
-          const selectedDepartment = departmentDropdown.value;
+          const selectedDepartment = departmentDropdown.value==="Computer Science Engineering" ? "CSE" : departmentDropdown.value;
           const selectedCourse = courseDropdown.value;
           const selectedBranch = branchDropdown.value;
           const selectedSemester = semesterDropdown.value;
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   getSubjectsButton.addEventListener("click", function () {
-    const selectedDepartment = departmentDropdown.value;
+    const selectedDepartment = departmentDropdown.value==="Computer Science Engineering" ? "CSE" : departmentDropdown.value;
     const selectedCourse = courseDropdown.value;
     const selectedBranch = branchDropdown.value;
     const selectedSemester = semesterDropdown.value;
