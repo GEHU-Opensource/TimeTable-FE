@@ -136,7 +136,7 @@ function gatherFormData(selectedSubjects) {
     name: elements["name"].value,
     phone: elements["phone"].value,
     email: elements["email"].value,
-    department: elements["department"].value==="Computer Science Engineering" ? "CSE" : elements["department"].value,
+    department: elements["department"].value,
     designation: elements["designation"].value,
     working_days: elements["working_days"].value,
     preferred_subjects: selectedSubjects,
