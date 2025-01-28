@@ -154,7 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
           editButton.textContent = "Save";
         } else {
           const selectedDepartment = departmentDropdown.value;
-          const selectedDepartment = departmentDropdown.value;
           const selectedCourse = courseDropdown.value;
           const selectedBranch = branchDropdown.value;
           const selectedSemester = semesterDropdown.value;
