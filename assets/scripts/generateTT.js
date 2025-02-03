@@ -106,59 +106,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   generateButton.addEventListener("click", function () {
     const data = {
-      department: departmentDropdown.value,
-      course: courseDropdown.value,
-      branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
-      year: yearDropdown.value,
-      semester: semesterDropdown.value,
+        department: departmentDropdown.value,
+        course: courseDropdown.value,
+        branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+        year: yearDropdown.value,
+        semester: semesterDropdown.value,
     };
-    if (!data.department || !data.course || !data.year || !data.semester) {
-      alert("Fill the Details!");
-      return;
-    }
-    if (branch === "") {
-      //
-    } else {
-    }
-    alert("TimeTable is Generated...Redirecting to the View Page");
-    window.location.href = "../admin/viewTT.html";
-    /*
-        const file = generateTT; // API:departmen/course/branch/year/semester
 
-        if(typeof file !== "undefined") {
-            fetch(file, {
-                method: "GET",
-                headers: {
-                    // Add any required headers (e.g., authentication token if needed)
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok " + response.statusText);
-                    }
-                    return response.arrayBuffer();
-                })
-                .then((data) => {
-                    timetable.style.display = "block";
-                    const workbook = XLSX.read(data, { type: "array" });
-                    const sheetNames = workbook.SheetNames;
-                    populateSheetSelector(sheetNames);
-                    displaySheet(workbook, sheetNames[0]);
-                    const sheetSelector = document.getElementById("sheet-selector");
-                    sheetSelector.addEventListener("change", function () {
-                        const selectedSheet = sheetSelector.value;
-                        displaySheet(workbook, selectedSheet);
-                    });
-                })
-                .catch((error) => {
-                    alert("Failed to load the Excel file: " + error.message);
-                });
+    // Validate the input fields
+    if (!data.department || !data.course || !data.year || !data.semester) {
+        alert("Fill in all the details!");
+        return;
+    }
+
+    // Construct the API endpoint
+    const apiEndpoint = generateTT;
+    fetch(apiEndpoint, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            // Add any authentication headers if required
+        },
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok: " + response.statusText);
         }
-        else {
-            alert("Excel file path is missing in data.js.");
-        }*/
-  });
+        return response.arrayBuffer(); // Assuming you need the response as an ArrayBuffer
+    })
+    .then((data) => {
+        alert("TimeTable is Generated...Redirecting to the View Page");
+        window.location.href = "../admin/viewTT.html"; // Redirect to view page
+    })
+    .catch((error) => {
+        alert("Failed to load the timetable: " + error.message);
+    });
+});
 
   downloadButton.addEventListener("click", () => {
     const apiEndpoint = generateTT; // Replace with your API endpoint
