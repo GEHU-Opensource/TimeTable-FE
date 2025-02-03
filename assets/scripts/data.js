@@ -185,4 +185,4 @@ const departments = [
 ];
 
 const generateTT = "../testing.xlsx";
-const BE_URL = "http://192.168.5.29:8000";
+const BE_URL = "http://127.0.0.1:8000/";

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detect Conflicts</title>
+    <link rel="stylesheet" href="../assets/styles/detectConflicts.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../assets/images/logo.png" alt="logo" />
+      <nav>
+        <ul>
+          <li><a href="/admin/subject.html">Subject Details</a></li>
+          <li><a href="/admin/class.html">Class Details</a></li>
+          <li><a href="/admin/generateTT.html">Generate TT</a></li>
+          <li><a href="/admin/updateTT.html">Manual Update TT</a></li>
+          <li><a href="/admin/viewTT.html">View TT</a></li>
+          <li><a href="/admin/sectionAllocate.html">Section Allocate</a></li>
+          <li><a href="/admin/detectConflicts.html">Detect Conflicts</a></li>
+        </ul>
+      </nav>
+      <button class="logout-btn">Logout</button>
+    </header>
+    <div class="container">
+      <h1>Detect Conflicts</h1>
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input
+          type="file"
+          id="csvFiles"
+          name="csv_files"
+          multiple
+          accept=".csv"
+        />
+        <button type="submit">Upload & Detect</button>
+      </form>
+      <div id="response"></div>
+    </div>
+    <script src="../assets/scripts/detectConflicts.js"></script>
+  </body>
+</html>
