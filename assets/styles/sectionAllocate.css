@@ -65,7 +65,7 @@ main {
     align-items: center;
     flex-direction: column;
     min-height: calc(100vh - 80px);
-    padding: 20px;
+    padding: 30px;
 }
 
 .form-container {
@@ -139,7 +139,6 @@ select:focus {
 
 .file-label {
     background-color: #adb5bd;
-    color: #fff;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
