@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", function () {
     uploadForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
+    if (csvInput.files.length <= 1) {
+      showMessage("Please select at least two CSV files.", "error");
+      return;
+    }
         if (csvInput.files.length === 0) {
             showMessage("Please select at least one CSV file.", "error");
             return;
