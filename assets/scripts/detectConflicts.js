@@ -2,12 +2,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const uploadForm = document.getElementById("uploadForm");
   const csvInput = document.getElementById("csvFiles");
   const responseDiv = document.getElementById("response");
+  const baseUrl = BE_URL;
 
   uploadForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    if (csvInput.files.length === 0) {
-      showMessage("Please select at least one CSV file.", "error");
+    if (csvInput.files.length <= 1) {
+      showMessage("Please select at least two CSV files.", "error");
       return;
     }
 
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       showMessage("Processing... Please wait.", "info");
 
-      const response = await fetch("http://127.0.0.1:8000/detectConflicts/", {
+      const response = await fetch(`${baseUrl}/detectConflicts/`, {
         method: "POST",
         body: formData,
       });
@@ -50,12 +51,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function displayConflicts(conflicts) {
-    responseDiv.innerHTML = "<h3>Conflicts Found:</h3>";
+    responseDiv.innerHTML = "<h3>Conflicts:</h3>";
     conflicts.forEach((conflict, index) => {
       const conflictEntry = document.createElement("div");
       conflictEntry.classList.add("conflict-entry");
 
-      // Ensure conflict.details is formatted correctly
       const conflictMessage = conflict.conflict_details
         ? JSON.stringify(conflict.conflict_details, null, 2) // Convert the conflict details object to a string
         : conflict.message || "Details not provided";
