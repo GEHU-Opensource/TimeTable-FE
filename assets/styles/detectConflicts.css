@@ -1,124 +1,126 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  margin: 0;
-  padding: 0;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-header img {
-  height: 70px;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-}
-
-nav ul li a {
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
-}
-
-nav ul li a:hover {
-  text-decoration: none;
-  color: #666;
-}
-
-.logout-btn {
-  background-color: #d62828;
-  color: #fff;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.logout-btn:hover {
-  background-color: #9a031e;
-}
-
-.container {
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  text-align: center;
-}
-
-h1 {
-  color: #333;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  padding: 20px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  background: #f9f9f9;
-}
-
-input[type="file"] {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 80%;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-button {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: 0.3s ease-in-out;
-}
-
-button:hover {
-  background-color: #155724;
-}
-
-/* Response Box */
-#response {
-  margin-top: 20px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #eef2f3;
-  font-size: 14px;
-  text-align: left;
-  display: none;
-  width: 100%;
-}
-
-.success {
-  border: 1px solid #28a745;
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.error {
-  border: 1px solid #dc3545;
-  background-color: #f8d7da;
-  color: #721c24;
-}
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  header img {
+    height: 70px;
+  }
+  
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  nav ul li a:hover {
+    text-decoration: none;
+    color: #666;
+  }
+  
+  .logout-btn {
+    background-color: #d62828;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .logout-btn:hover {
+    background-color: #9a031e;
+  }
+  
+  /* Container */
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  /* Form Styling */
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+  
+  input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%;
+    cursor: pointer;
+  }
+  
+  button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #155724;
+  }
+  
+  /* Response Box */
+  #response {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #eef2f3;
+    font-size: 14px;
+    text-align: left;
+    display: none;
+    width: 100%;
+  }
+  
+  .success {
+    border: 1px solid #28a745;
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .error {
+    border: 1px solid #dc3545;
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
