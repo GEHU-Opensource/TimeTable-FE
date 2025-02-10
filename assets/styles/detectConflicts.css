@@ -104,25 +104,29 @@ button:hover {
 #response {
     margin-top: 20px;
     padding: 10px;
+    padding-left: 30px;
     border-radius: 5px;
     background-color: #eef2f3;
-    font-size: 14px;
+    font-size: 15px;
     text-align: left;
     display: none;
 }
 
 .success {
-    border: 1px solid #28a745;
-    background-color: #d4edda;
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
     color: #155724;
 }
 
 .error {
-    border: 1px solid #dc3545;
-    background-color: #f8d7da;
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
     color: #721c24;
 }
 
 h3 {
     text-align: center;
+    font-size: 1.4em;
 }
