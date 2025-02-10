@@ -3,6 +3,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const csvInput = document.getElementById("csvFiles");
   const responseDiv = document.getElementById("response");
   const baseUrl = BE_URL;
+  const logoutBtn = document.querySelector(".logout-btn");
+  logoutBtn.addEventListener("click", () => {
+    localStorage.clear();
+    window.location.href = "../login.html";
+  });
 
   uploadForm.addEventListener("submit", async function (event) {
     event.preventDefault();
