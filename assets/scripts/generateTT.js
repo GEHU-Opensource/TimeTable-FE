@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const baseUrl = BE_URL;
   const departmentDropdown = document.getElementById("department");
   const courseDropdown = document.getElementById("course");
   const branchDropdown = document.getElementById("branch");
@@ -120,26 +121,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Construct the API endpoint
-    const apiEndpoint = generateTT;
+    const apiEndpoint = `${baseUrl}/generateTimetable/`;
+    const token = localStorage.getItem("access_token");
     fetch(apiEndpoint, {
-        method: "GET",
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            // Add any authentication headers if required
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Added Authorization header
         },
+        body: JSON.stringify(data)
     })
     .then((response) => {
         if (!response.ok) {
-            throw new Error("Network response was not ok: " + response.statusText);
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
         }
-        return response.arrayBuffer(); // Assuming you need the response as an ArrayBuffer
+        return response.json(); // Assuming backend returns JSON response
     })
-    .then((data) => {
-        alert("TimeTable is Generated...Redirecting to the View Page");
-        window.location.href = "../admin/viewTT.html"; // Redirect to view page
+    .then((responseData) => {
+        console.log("Timetable generated successfully:", responseData);
+        console.log(typeof responseData);
+        console.log(JSON.stringify(responseData));
+        alert("Timetable generated successfully!");
+        // Handle responseData as needed (e.g., display it on the page)
     })
     .catch((error) => {
-        alert("Failed to load the timetable: " + error.message);
+        console.error("Error generating timetable:", error);
+        alert("Failed to generate the timetable: " + error.message);
     });
 });
 
