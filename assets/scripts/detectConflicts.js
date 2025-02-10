@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const data = await response.json();
       responseDiv.style.display = "block";
+      responseDiv.innerHTML = "";
 
       if (response.ok) {
         if (data.conflicts && data.conflicts.length > 0) {
@@ -54,24 +55,23 @@ document.addEventListener("DOMContentLoaded", function () {
     responseDiv.style.display = "block";
   }
 
-  function displayConflicts(conflicts) {
-    responseDiv.innerHTML = "<h3>Conflicts Found</h3>";
-    conflicts.forEach((conflict, index) => {
-      const conflictEntry = document.createElement("div");
-      conflictEntry.classList.add("conflict-entry");
+    function displayConflicts(conflicts) {
+        responseDiv.innerHTML = "<h3>Conflicts Found</h3>";
+        conflicts.forEach((conflict, index) => {
+            const conflictEntry = document.createElement("div");
+            conflictEntry.classList.add("conflict-entry");
 
-      // Ensure conflict.details is formatted correctly
-      const conflictMessage = conflict.conflict_details
-        ? JSON.stringify(conflict.conflict_details, null, 2) // Convert the conflict details object to a string
-        : conflict.message || "Details not provided";
+            // Ensure conflict.details is formatted correctly
+            const conflictMessage = conflict.conflict_details
+                ? JSON.stringify(conflict.conflict_details, null, 2) // Convert the conflict details object to a string
+                : conflict.message || "Details not provided";
 
-      conflictEntry.innerHTML = `
+            conflictEntry.innerHTML = `
                   <pre><strong>Conflict Details:</strong> ${conflictMessage}</pre>
                   <hr>
               `;
-      responseDiv.appendChild(conflictEntry);
-    });
-    responseDiv.style.display = "block";
-
-  }
+            responseDiv.appendChild(conflictEntry);
+        });
+        responseDiv.style.display = "block";
+    }
 });
