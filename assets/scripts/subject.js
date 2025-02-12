@@ -134,6 +134,26 @@ document.addEventListener("DOMContentLoaded", () => {
                         </select>
                     </td>
                     <td>
+                        <select class="subject-weekly" disabled>
+                            <option value="1" ${subject.weekly_quota_limit === 1 ? "selected" : ""
+                }>1</option>
+                            <option value="2" ${subject.weekly_quota_limit === 2 ? "selected" : ""
+                }>2</option>
+                            <option value="3" ${subject.weekly_quota_limit === 3 ? "selected" : ""
+                }>3</option>
+                            <option value="4" ${subject.weekly_quota_limit === 4 ? "selected" : ""
+                }>4</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="subject-special" disabled>
+                            <option value="1" ${subject.is_special_subject === "No" ? "selected" : ""
+                }>No</option>
+                            <option value="2" ${subject.is_special_subject === "Yes" ? "selected" : ""
+                }>Yes</option>
+                        </select>
+                    </td>
+                    <td>
                         <button class="edit-btn">Edit</button>
                         <button class="delete-btn">Delete</button>
                     </td>
@@ -222,9 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                             return response.json();
                         })
-                        .then((data) => {
-                            alert(data.message);
-                        })
                         .catch((error) => {
                             console.error("Error deleting subject:", error);
                             alert("Failed to delete subject. Please try again.");
@@ -298,6 +315,20 @@ document.addEventListener("DOMContentLoaded", () => {
                         <option value="4">4</option>
                     </select>
                 </td>
+                <td>
+                    <select class="subject-weekly">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="subject-special">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </td>
                 <td><button class="delete-btn">Delete</button></td>
             `;
         const deleteButton = newRow.querySelector(".delete-btn");
@@ -326,11 +357,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const subjectCodeInput = row.querySelector(".subject-code");
             const subjectNameInput = row.querySelector(".subject-name");
             const subjectCreditInput = row.querySelector(".subject-credit");
+            const subjectWeeklyInput = row.querySelector(".subject-weekly");
+            const specialSubjectInput = row.querySelector(".subject-special");
 
             if (subjectCodeInput && subjectNameInput && subjectCreditInput) {
                 const subjectCode = subjectCodeInput.value.trim();
                 const subjectName = subjectNameInput.value.trim();
                 const subjectCredit = subjectCreditInput.value.trim();
+                const subjectWeekly = subjectWeeklyInput.value.trim();
+                const specialSubject = specialSubjectInput.value.trim();
 
                 if (subjectCode && subjectName && subjectCredit) {
                     const subject = {
@@ -339,9 +374,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         branch: selectedBranch !== "No Branch" ? selectedBranch : "",
                         year: selectedYear,
                         semester: selectedSemester,
-                        subject_code: subjectCode,
                         subject_name: subjectName,
+                        subject_code: subjectCode,
                         credits: subjectCredit,
+                        weekly_quota_limit: subjectWeekly,
+                        is_special_subject: specialSubject,
                     };
                     data.push(subject);
                 } else {
