@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty | Home</title>
+    <link rel="shortcut icon" href="../assets/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/styles/profile.css" />
+</head>
+
+<body>
+    <header>
+        <img src="../assets/images/logo.png" alt="logo" />
+        <nav>
+            <ul>
+                <li><a href="/faculty/profile.html">Profile</a></li>
+            </ul>
+        </nav>
+        <button class="logout-btn">Logout</button>
+    </header>
+
+    <div class="container">
+        <div class="header-container">
+            <h2>Profile</h2>
+            <button id="editBtn">Edit</button>
+        </div>
+        <form id="profileForm">
+            <label for="name">Name *</label>
+            <input type="text" id="name" placeholder="e.g. JOHN DOE" disabled required>
+            
+            <label for="phone">Contact Number *</label>
+            <input type="text" id="phone" placeholder="e.g. 9782XXXXXX" disabled required>
+            
+            <label for="email">Official Email *</label>
+            <input type="email" id="email" placeholder="e.g. XYZ.123@gehu.ac.in" pattern=".+@gehu\.ac\.in" disabled required>
+            
+            <label for="department">Department *</label>
+            <select id="department" disabled required>
+                <option value="">Select Department</option>
+            </select>
+            
+            <label for="designation">Designation *</label>
+            <select id="designation" disabled required>
+                <option value="">Select Designation</option>
+                <option value="Professor">Professor</option>
+                <option value="HOD">HOD</option>
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Lecturer">Lecturer</option>
+                <option value="Lab Assistant">Lab Assistant</option>
+            </select>
+            
+            <label for="working_days">Working Days *</label>
+            <select id="working_days" disabled required>
+                <option value="">Select Working Days</option>
+                <option value="Monday-Friday">Monday-Friday</option>
+                <option value="Tuesday-Saturday">Tuesday-Saturday</option>
+                <option value="Monday-Saturday">Monday-Saturday</option>
+            </select>
+            
+            <label for="subjects">Preferred Subjects *</label>
+            <input type="text" id="searchSubjects" placeholder="Search and select subjects" disabled required>
+    
+            <div class="dropdown-content"></div>
+
+            <div class="selected-subjects">
+            <label for="selected">Selected Subjects *</label>
+            <div id="subjectList"></div>
+            </div>
+            
+            <button type="submit" id="submitBtn" disabled>Submit</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>Update Credentials</h2>
+        <form id="updateCredentialsForm">
+            <label for="username">Username *</label>
+            <input type="text" id="username">
+            
+            <label for="password">New Password *</label>
+            <input type="password" id="password">
+            
+            <button type="submit">Update</button>
+        </form>
+    </div>
+    <script>document.getElementById("editBtn").addEventListener("click", function() {
+        const inputs = document.querySelectorAll("#profileForm input, #profileForm select");
+        const submitBtn = document.getElementById("submitBtn");
+
+        let isDisabled = inputs[0].disabled;
+        
+        inputs.forEach(input => {
+            input.disabled = !isDisabled;
+        });
+
+        submitBtn.disabled = !isDisabled;
+    });</script>
+</body>
+
+</html>96+
