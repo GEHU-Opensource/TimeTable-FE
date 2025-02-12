@@ -8,22 +8,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const generateButton = document.getElementById("generateTT");
     const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
+    const addTimeSlotButton = document.getElementById("add-time-slot");
     const logoutBtn = document.querySelector(".logout-btn");
+
     logoutBtn.addEventListener("click", () => {
         localStorage.clear();
         window.location.href = "../login.html";
     });
-
-    if (typeof departments !== "undefined") {
-        departments.forEach((department) => {
-            const option = document.createElement("option");
-            option.value = department.name;
-            option.textContent = department.name;
-            departmentDropdown.appendChild(option);
-        });
-    } else {
-        console.error("Departments data is not defined.");
-    }
 
     function clearDropdown(dropdown) {
         dropdown.innerHTML = "";
@@ -40,6 +31,17 @@ document.addEventListener("DOMContentLoaded", () => {
             opt.textContent = option[textKey];
             dropdown.appendChild(opt);
         });
+    }
+
+    if (typeof departments !== "undefined") {
+        departments.forEach((department) => {
+            const option = document.createElement("option");
+            option.value = department.name;
+            option.textContent = department.name;
+            departmentDropdown.appendChild(option);
+        });
+    } else {
+        console.error("Departments data is not defined.");
     }
 
     departmentDropdown.addEventListener("change", function () {
@@ -105,6 +107,69 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     });
 
+    addTimeSlotButton.addEventListener("click", function () {
+        const tbody = document.getElementById("time-slot-body");
+
+        const row = document.createElement("tr");
+        row.classList.add("sortable");
+
+        row.innerHTML = `
+            <td><input type="time" class="time-slot-input start-time"></td>
+            <td><input type="time" class="time-slot-input end-time"></td>
+            <td><button class="delete-btn"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+        `;
+
+        tbody.appendChild(row);
+        makeRowsSortable();
+    });
+
+    document.getElementById("time-slot-body").addEventListener("click", function (event) {
+        if (event.target.closest(".delete-btn")) {
+            const row = event.target.closest("tr");
+            const startTime = row.querySelector(".start-time").value;
+            const endTime = row.querySelector(".end-time").value;
+            if (!startTime && !endTime) {
+                row.remove();
+            } else {
+                if (confirm("This row contains data. Are you sure you want to delete it?")) {
+                    row.remove();
+                }
+            }
+        }
+    });
+
+    function makeRowsSortable() {
+        let draggedRow = null;
+        const tbody = document.getElementById("time-slot-body");
+
+        tbody.querySelectorAll("tr").forEach(row => {
+            row.draggable = true;
+
+            row.addEventListener("dragstart", function () {
+                draggedRow = this;
+                setTimeout(() => this.style.opacity = "0.5", 0);
+            });
+
+            row.addEventListener("dragend", function () {
+                setTimeout(() => this.style.opacity = "1", 0);
+                draggedRow = null;
+            });
+
+            row.addEventListener("dragover", function (e) {
+                e.preventDefault();
+                const rows = Array.from(tbody.children);
+                const indexDragged = rows.indexOf(draggedRow);
+                const indexOver = rows.indexOf(this);
+
+                if (indexDragged > indexOver) {
+                    tbody.insertBefore(draggedRow, this);
+                } else {
+                    tbody.insertBefore(draggedRow, this.nextSibling);
+                }
+            });
+        });
+    }
+
     generateButton.addEventListener("click", function () {
         const data = {
             department: departmentDropdown.value,
@@ -112,93 +177,78 @@ document.addEventListener("DOMContentLoaded", () => {
             branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
             year: yearDropdown.value,
             semester: semesterDropdown.value,
+            time_slots: []
         };
 
-        // Validate the input fields
+        document.querySelectorAll("#time-slot-body tr").forEach((row, index) => {
+            const startTime = row.querySelector(".start-time").value;
+            const endTime = row.querySelector(".end-time").value;
+
+            if (startTime && endTime) {
+                const format12HourWithoutAMPM = (time) => {
+                    let [hour, minute] = time.split(":");
+                    hour = parseInt(hour);
+                    let formattedHour = hour % 12 || 12; // Convert 24-hour to 12-hour format
+                    return `${formattedHour}:${minute}`;
+                };
+
+                data.time_slots[index + 1] = `${format12HourWithoutAMPM(startTime)} - ${format12HourWithoutAMPM(endTime)}`;
+            }
+        });
+
+        console.log(data);
+
         if (!data.department || !data.course || !data.year || !data.semester) {
-            alert("Fill in all the details!");
+            alert("Fill in all the details");
+            return;
+        }
+        if (data.time_slots.length === 0) {
+            alert("Add at least one time slot!");
             return;
         }
 
-        // Construct the API endpoint
         const token = localStorage.getItem("access_token");
-        console.log(baseUrl);
+
         fetch(`${baseUrl}/generateTimetable/`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${token}`, // Added Authorization header
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data)
         })
-            .then((response) => {
-                return response.json(); // Assuming backend returns JSON response
-            })
-            .then((responseData) => {
+            .then(response => response.json())
+            .then(responseData => {
                 console.log("Timetable generated successfully:", responseData);
-                console.log(typeof responseData);
-                console.log(JSON.stringify(responseData));
                 alert("Timetable generated successfully!");
-                // Handle responseData as needed (e.g., display it on the page)
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error("Error generating timetable:", error);
                 alert("Failed to generate the timetable: " + error.message);
             });
     });
 
     downloadButton.addEventListener("click", () => {
-        const apiEndpoint = generateTT; // Replace with your API endpoint
-
-        fetch(apiEndpoint, {
+        fetch(`${baseUrl}/downloadTimetable/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(
-                        "Network response was not ok: " + response.statusText
-                    );
-                }
-                const contentDisposition = response.headers.get("Content-Disposition");
-                const filename =
-                    contentDisposition && contentDisposition.includes("filename=")
-                        ? contentDisposition.split("filename=")[1].trim().replace(/"/g, "")
-                        : "timeTable_new.xlsx"; // Default filename if not found
-
-                return response.blob().then((blob) => ({ filename, blob }));
+            .then(response => {
+                if (!response.ok) throw new Error("Download failed");
+                return response.blob();
             })
-            .then(({ filename, blob }) => {
+            .then(blob => {
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = filename;
+                link.download = "timetable.xlsx";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             })
-            .catch((error) => {
+            .catch(error => {
                 alert("Failed to download the file: " + error.message);
             });
     });
-
-    function populateSheetSelector(sheetNames) {
-        const sheetSelector = document.getElementById("sheet-selector");
-        sheetSelector.style.display = "inline";
-        sheetSelector.innerHTML = "";
-        sheetNames.forEach((sheetName) => {
-            const option = document.createElement("option");
-            option.value = sheetName;
-            option.textContent = sheetName;
-            sheetSelector.appendChild(option);
-        });
-    }
-
-    function displaySheet(workbook, sheetName) {
-        const sheet = workbook.Sheets[sheetName];
-        const html = XLSX.utils.sheet_to_html(sheet);
-        const outputDiv = document.getElementById("output");
-        outputDiv.innerHTML = html;
-    }
 });

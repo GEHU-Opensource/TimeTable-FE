@@ -104,20 +104,50 @@ h2 {
     box-sizing: border-box;
 }
 
-#download-btn {
-    padding: 10px;
-    font-size: 14px;
+.time-slot-group {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #28a745;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
 }
 
-#download-btn:hover {
-    background-color: #218838;
+#add-time-slot {
+    background-color: transparent;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.delete-btn {
+    background-color: transparent;
+    font-size: 15px;
+    border: none;
+    color: #d62828;
+    cursor: pointer;
+}
+.delete-btn:hover {
+    color: #9a031e;
+}
+.sortable {
+    cursor: grab;
 }
 
 select:focus {
@@ -143,12 +173,28 @@ select:focus {
     background-color: #218838;
 }
 
-table {
+#download-btn {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#download-btn:hover {
+    background-color: #218838;
+}
+
+/* table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px;
-}
-
+    }
+    
 th, td {
     padding: 12px;
     text-align: left;
@@ -159,7 +205,7 @@ th {
     background-color: #f1f1f1;
     font-weight: bold;
     color: #333;
-}
+} */
 
 .show {
     margin: 30px;
