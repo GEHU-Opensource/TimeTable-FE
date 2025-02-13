@@ -110,6 +110,13 @@ h2 {
     margin-bottom: 10px;
 }
 
+.time-slot-group label {
+    display: block;
+    margin: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
 #add-time-slot {
     background-color: transparent;
     font-size: 20px;
