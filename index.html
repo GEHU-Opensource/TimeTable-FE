@@ -4,50 +4,38 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
     <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <title>TimeTable</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f5f5f5;
-        }
-
-        .links {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: row;
-            gap: 20px;
-        }
-
-        a {
-            text-decoration: none;
-            color: #fff;
-            background-color: #282828;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/styles/style.css" />
 </head>
 
 <body>
-    <div class="links">
-        <a href="faculty.html">Faculty</a>
-        <a href="login.html">Admin</a>
+    <!-- Header Section -->
+    <header class="header">
+        <img src="assets/images/logo.png" alt="Logo" class="logo" />
+    </header>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="e.g. XYZ.123@gehu.ac.in" required />
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required />
+                <div class="show">
+                    <input type="checkbox" id="show-password" onclick="togglePassword()"> Show Password
+                </div>
+            </div>
+            <button type="submit" class="btn">Login</button>
+            <p id="error-message" class="error-message"></p>
+        </form>
     </div>
-    <script>
-        localStorage.clear();
-    </script>
+    <script src="assets/scripts/data.js"></script>
+    <script src="assets/scripts/script.js"></script>
 </body>
 
 </html>

@@ -7,81 +7,82 @@
     <title>Subject Details</title>
     <link rel="shortcut icon" href="../assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/styles/subject.css" />
+    <script src="../assets/scripts/data.js"></script>
+    <script type="module" src="../assets/scripts/subject.js"></script>
     <script>
-        function validateSession() {
+        async function validateSession() {
             const accessToken = localStorage.getItem("access_token");
             const refreshToken = localStorage.getItem("refresh_token");
             const expirationTime = localStorage.getItem("sessionExpiresAt");
-
-            // If either token is missing, redirect to login
+    
             if (!accessToken || !refreshToken || !expirationTime) {
                 alert("You are not authorized! Redirecting to login.");
-                localStorage.clear();
+                removeSessionData();
                 window.location.href = "../login.html";
                 return false;
             }
-
+    
             const currentTime = Date.now();
-            // If the access token is expired, attempt to refresh it
+    
+            // If token expired, refresh it
             if (currentTime >= expirationTime) {
-                refreshAccessToken(refreshToken);
-                return false;
+                const refreshed = await refreshAccessToken(refreshToken);
+                return refreshed;
             }
-
+    
             startTimer(expirationTime);
             return true;
         }
-
-        function refreshAccessToken(refreshToken) {
-            fetch("http://127.0.0.1:8000/api/token/refresh/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ refresh: refreshToken }),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.access) {
-                        // Update access token and expiration time
-                        localStorage.setItem("access_token", data.access);
-                        const expirationTime = Date.now() + 60 * 60 * 1000; // 1 hour expiration
-                        localStorage.setItem("sessionExpiresAt", expirationTime);
-                        alert("Session refreshed!");
-                        // Retry validation after refreshing
-                        validateSession();
-                    } else {
-                        alert("Session expired! Redirecting to login.");
-                        localStorage.clear();
-                        window.location.href = "../login.html";
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error refreshing access token:", error);
-                    alert("Session expired! Redirecting to login.");
-                    localStorage.clear();
-                    window.location.href = "../login.html";
+    
+        async function refreshAccessToken(refreshToken) {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh: refreshToken }),
                 });
+    
+                const data = await response.json();
+    
+                if (response.ok && data.access) {
+                    const newExpirationTime = Date.now() + 2 * 60 * 60 * 1000; // 2 hours
+                    localStorage.setItem("access_token", data.access);
+                    localStorage.setItem("sessionExpiresAt", newExpirationTime);
+                    alert("Session refreshed!");
+    
+                    return validateSession();
+                } else {
+                    throw new Error(data.detail || "Session refresh failed");
+                }
+            } catch (error) {
+                console.error("Error refreshing access token:", error);
+                alert("Session expired! Redirecting to login.");
+                removeSessionData();
+                window.location.href = "../login.html";
+                return false;
+            }
         }
-
+    
+        let sessionTimer;
         function startTimer(expirationTime) {
-            const timer = setInterval(() => {
+            if (sessionTimer) clearInterval(sessionTimer); // Clear previous timer
+            sessionTimer = setInterval(() => {
                 const currentTime = Date.now();
                 if (currentTime >= expirationTime) {
                     alert("Session Expired!");
-                    clearInterval(timer);
-                    localStorage.removeItem("access_token");
-                    localStorage.removeItem("refresh_token");
-                    localStorage.removeItem("sessionExpiresAt");
+                    clearInterval(sessionTimer);
+                    removeSessionData();
                     window.location.href = "../login.html";
                 }
             }, 1000);
         }
-
+    
+        function removeSessionData() {
+            localStorage.clear();
+        }
+    
         validateSession();
     </script>
-    <script src="../assets/scripts/data.js"></script>
-    <script type="module" src="../assets/scripts/subject.js"></script>
 </head>
 
 <body>

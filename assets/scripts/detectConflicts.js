@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const logoutBtn = document.querySelector(".logout-btn");
     logoutBtn.addEventListener("click", () => {
         localStorage.clear();
-        window.location.href = "../login.html";
+        window.location.href = "../index.html";
     });
 
     uploadForm.addEventListener("submit", async function (event) {
