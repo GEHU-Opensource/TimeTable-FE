@@ -33,7 +33,7 @@ loginForm.addEventListener("submit", async (e) => {
             if (data.teacher.teacher_type === "faculty") {
                 window.location.href = "/faculty/profile.html";
             } else if (data.teacher.teacher_type === "hod") {
-                window.location.href = "/faculty/hod.html";
+                window.location.href = "/hod/profile.html";
             } else {
                 window.location.href = "/admin/subject.html";
             }
