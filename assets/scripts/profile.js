@@ -62,14 +62,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleEditMode(enable) {
         const inputs = profileForm.querySelectorAll("input, select");
-        inputs.forEach(input => input.disabled = !enable);
+        inputs.forEach(input => {
+            if (!["email", "phone", "name"].includes(input.id)) {
+                input.disabled = !enable;
+            }
+        });
+    
         submitBtn.disabled = !enable;
         editButton.querySelector("i").classList.toggle("fa-pencil", !enable);
         editButton.querySelector("i").classList.toggle("fa-times", enable);
-    }
+    }    
 
     function isDataChanged() {
         const updatedData = {
+            id: originalData.id,
             name: profileForm.elements["name"].value,
             phone: profileForm.elements["phone"].value,
             email: profileForm.elements["email"].value,
@@ -82,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     editButton.addEventListener("click", () => {
-        const isEditing = !profileForm.elements["name"].disabled;
+        const isEditing = !profileForm.elements["department"].disabled;
 
         if (isEditing) {
             if (isDataChanged()) {
@@ -116,8 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
             working_days: profileForm.elements["working_days"].value,
             preferred_subjects: selectedSubjects,
         };
-        submitData(updatedData);
+        if(confirm("Are you sure to Submit these details?"))
+            submitData(updatedData);
     });
+
     function submitData(updatedData) {
         const token = localStorage.getItem("access_token");
         console.log(updatedData);
