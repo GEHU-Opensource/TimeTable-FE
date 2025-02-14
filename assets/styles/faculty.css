@@ -147,17 +147,12 @@ button[type="submit"]:hover {
 
 .spinner {
     border: 4px solid #f3f3f3;
-    /* Light grey */
     border-top: 4px solid #007bff;
-    /* Blue color for the spinner */
     border-radius: 50%;
     width: 50px;
-    /* Adjust size */
     height: 50px;
-    /* Adjust size */
     animation: spin 1.5s linear infinite;
     margin: 0 auto;
-    /* Center the spinner */
 }
 
 @keyframes spin {
