@@ -183,7 +183,7 @@ function submitFormData(data) {
             document.getElementById("loading-spinner").style.display = "none";
 
             // Display error messages from response
-            if (error.message.includes("Teacher with this email already exists.")) {
+            if (error.message.includes("User with this email already exists.")) {
                 alert("This teacher's email already exists. Please try again.");
             } else {
                 alert("Failed to submit data. Please try again.");
