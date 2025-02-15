@@ -133,7 +133,7 @@ function setupFormSubmission() {
 function gatherFormData(selectedSubjects) {
     const elements = form.elements;
     const data = {
-        name: elements["name"].value,
+        name: titleCase(elements["name"].value),
         phone: elements["phone"].value,
         email: elements["email"].value,
         department: elements["department"].value,
@@ -142,6 +142,10 @@ function gatherFormData(selectedSubjects) {
         preferred_subjects: selectedSubjects,
     };
     return data;
+}
+
+function titleCase(s) {
+    return s.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
 function submitFormData(data) {
