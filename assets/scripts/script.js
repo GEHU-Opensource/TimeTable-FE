@@ -60,3 +60,7 @@ function togglePassword() {
         showPass.type = "password";
     }
 }
+
+document.addEventListener("DOMContentLoaded", ()=> {
+    localStorage.clear();
+});
