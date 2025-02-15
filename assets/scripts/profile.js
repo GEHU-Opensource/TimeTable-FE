@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function toggleEditMode(enable) {
         const inputs = profileForm.querySelectorAll("input, select");
         inputs.forEach(input => {
-            if (!["email", "phone", "name"].includes(input.id)) {
+            if (!["email", "name"].includes(input.id)) {
                 input.disabled = !enable;
             }
         });
@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return ;
         }
         const updatedData = {
+            id: originalData.id,
             name: profileForm.elements["name"].value,
             phone: profileForm.elements["phone"].value,
             email: profileForm.elements["email"].value,
