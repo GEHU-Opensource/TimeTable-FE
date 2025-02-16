@@ -71,33 +71,17 @@ document.addEventListener("DOMContentLoaded", () => {
         submitBtn.disabled = !enable;
         editButton.querySelector("i").classList.toggle("fa-pencil", !enable);
         editButton.querySelector("i").classList.toggle("fa-times", enable);
-    }    
-
-    function isDataChanged() {
-        const updatedData = {
-            id: originalData.id,
-            name: profileForm.elements["name"].value,
-            phone: profileForm.elements["phone"].value,
-            email: profileForm.elements["email"].value,
-            department: profileForm.elements["department"].value,
-            designation: profileForm.elements["designation"].value,
-            working_days: profileForm.elements["working_days"].value,
-            preferred_subjects: getSelectedSubjects(),
-        };
-        return JSON.stringify(updatedData) !== JSON.stringify(originalData);
     }
 
     editButton.addEventListener("click", () => {
         const isEditing = !profileForm.elements["department"].disabled;
 
         if (isEditing) {
-            if (isDataChanged()) {
-                if (confirm("You have unsaved changes. Discard them?")) {
-                    populateProfileForm(originalData);
-                    loadDepartments(originalData.department);
-                    loadSubjects(originalData.preferred_subjects || []);
-                    toggleEditMode(false);
-                }
+            if (confirm("You have unsaved changes. Discard them?")) {
+                populateProfileForm(originalData);
+                loadDepartments(originalData.department);
+                loadSubjects(originalData.preferred_subjects || []);
+                toggleEditMode(false);
             } else {
                 toggleEditMode(false);
             }
@@ -115,6 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         const updatedData = {
             id: originalData.id,
+            teacher_code: originalData.teacher_code,
+            teacher_type: originalData.teacher_type,
             name: profileForm.elements["name"].value,
             phone: profileForm.elements["phone"].value,
             email: profileForm.elements["email"].value,
@@ -123,13 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
             working_days: profileForm.elements["working_days"].value,
             preferred_subjects: selectedSubjects,
         };
+        console.log(updatedData);
         if(confirm("Are you sure to Submit these details?"))
             submitData(updatedData);
     });
 
     function submitData(updatedData) {
         const token = localStorage.getItem("access_token");
-        console.log(updatedData);
         fetch(`${baseUrl}/updateTeacher/${originalData.id}/`, {
             method: "PUT",
             headers: {
