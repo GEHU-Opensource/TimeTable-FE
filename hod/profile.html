@@ -89,9 +89,9 @@
         <img src="../assets/images/logo.png" alt="logo" />
         <nav>
             <ul>
-                <li><a href="/hod/profile.html">Profile</a></li>
                 <li><a href="/hod/timetable.html">TimeTable</a></li>
                 <li><a href="/hod/subjectReview.html">Review Request</a></li>
+                <li><a href="/hod/profile.html">Profile</a></li>
             </ul>
         </nav>
         <button class="logout-btn" id="logoutBtn">Logout</button>
@@ -125,6 +125,7 @@
                     <select id="designation" disabled required>
                         <option value="">Select Designation</option>
                         <option value="Professor">Professor</option>
+                        <option value="Adjunct">Adjunct</option>
                         <option value="HOD">HOD</option>
                         <option value="Assistant Professor">Assistant Professor</option>
                         <option value="Lecturer">Lecturer</option>
@@ -142,18 +143,41 @@
                 </div>
                 
                 <div class="floatRight">
-                    <label for="subjects">Preferred Subjects *</label>
+                    <label for="subjects">Subjects *</label>
                     <input type="text" id="searchSubjects" placeholder="Search and select subjects" disabled>
             
                     <div class="dropdown-content"></div>
+                    <p class="inRequest">Note: Subject(s) are pending for approval!</p>
     
                     <div class="selected-subjects">
-                        <label for="selected">Selected Subjects *</label>
+                        <label for="selected" id="selectedContainer">Selected Subjects *</label>
                         <div id="subjectList"></div>
                     </div>
                 </div>
             </div>
             
+        </form>
+    </div>
+
+    <div class="update-container">
+        <h2>Update Password</h2>
+        <form id="update-form">
+            <div class="input-group">
+                <label for="oldPass">Old Password *</label>
+                <input type="password" class="password" name="oldPass" id="oldPass" placeholder="Old Password" required />
+            </div>
+            <div class="input-group">
+                <label for="newPass">New Password *</label>
+                <input type="password" class="password" name="newPass" id="newPass" placeholder="New Password" required />
+            </div>
+            <div class="input-group">
+                <label for="confirmPass">Confirm Password *</label>
+                <input type="password" class="password" name="confirmPass" id="confirmPass" placeholder="Confirm Password" required />
+            </div>
+            <div class="show">
+                <input type="checkbox" id="show-password" onclick="togglePassword()"> Show Password
+            </div>
+            <button type="submit" class="btn" id="updatePassword">Update</button>
         </form>
     </div>
     <script src="../assets/scripts/data.js"></script>

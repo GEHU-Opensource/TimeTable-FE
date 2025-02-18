@@ -42,6 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(handleResponse)
         .then(data => {
             originalData = { ...data };
+            if(originalData.preferred_subjects.length===0) {
+                document.querySelector(".inRequest").style.display = "block";
+            }
+            else {
+                document.querySelector(".inRequest").style.display = "none";
+            }
             populateProfileForm(data);
             loadDepartments(data.department);
             loadSubjects(data.preferred_subjects || []);
@@ -62,11 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleEditMode(enable) {
         const inputs = profileForm.querySelectorAll("input, select");
-        inputs.forEach(input => {
-            if (!["email", "name"].includes(input.id)) {
-                input.disabled = !enable;
-            }
-        });
+        if(originalData && originalData.preferred_subjects.length === 0) {
+            inputs.forEach(input => {
+                if (!["email", "name"].includes(input.id)) {
+                    input.disabled = !enable;
+                }
+            });
+        }
+        else {
+            inputs.forEach(input => {
+                if (!["email", "name","searchSubjects"].includes(input.id)) {
+                    input.disabled = !enable;
+                }
+            });
+        }
     
         submitBtn.disabled = !enable;
         editButton.querySelector("i").classList.toggle("fa-pencil", !enable);
@@ -109,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
             working_days: profileForm.elements["working_days"].value,
             preferred_subjects: selectedSubjects,
         };
-        console.log(updatedData);
         if(confirm("Are you sure to Submit these details?"))
             submitData(updatedData);
     });
@@ -128,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(() => {
             alert("Profile updated successfully!");
             originalData = { ...updatedData };
-            toggleEditMode(false);
+            document.location.reload();
         })
         .catch(showError);
     }
@@ -136,11 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadDepartments(selectedDepartment) {
         departmentDropdown.innerHTML = "";
         if (Array.isArray(departments)) {
-            departments.forEach(dept => {
+            departments.forEach(department => {
                 const option = document.createElement("option");
-                option.value = dept.name;
-                option.textContent = dept.name;
-                if (dept.name === selectedDepartment) option.selected = true;
+                option.value = department.name;
+                option.textContent = department.name;
+                if (department.name === selectedDepartment) option.selected = true;
                 departmentDropdown.appendChild(option);
             });
         }
@@ -153,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(handleResponse)
             .then((subjects) => {
                 if (!Array.isArray(subjects) || subjects.length === 0) {
-                    dropdownContent.innerHTML = "<p>No subjects available</p>";
+                    dropdownContent.innerHTML = "<label>No subjects available</label>";
                     return;
                 }
     
@@ -186,7 +200,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 subjectList.appendChild(subjectElement);
             });
             selectedSubjectsContainer.style.display = "block";
-        } else {
+        }
+        else {
             selectedSubjectsContainer.style.display = "none";
         }
     }
@@ -203,20 +218,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function handleResponse(response) {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.json();
-    }
+        return response.json().then((data) => {
+            if (!response.ok) {
+                throw new Error(data.error || data.message || `HTTP error! Status: ${response.status}`);
+            }
+            return data;
+        });
+    }    
 
     function showError(error) {
         console.error("Error: ", error);
-        
-        if (error.message.includes("401")) {
+        const errorMessage = error.message || "An error occurred.";
+    
+        if (errorMessage.includes("401")) {
             alert("Session expired. Redirecting to login...");
             window.location.href = "../index.html";
         } else {
-            alert(error.message || "An error occurred.");
+            alert(errorMessage);
         }
-    }
+    }    
     
 
     function setupSearchInput() {
@@ -248,7 +268,45 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    document.getElementById("show-password").addEventListener("click", function () {
+        var passwordFields = document.querySelectorAll(".password");
+        passwordFields.forEach(function(field) {
+            if (field.type === "password") {
+                field.type = "text";
+            }
+            else {
+                field.type = "password";
+            }
+        });
+    });
+
+    document.getElementById("update-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const oldPasswordInput = document.getElementById("oldPass");
+        const newPasswordInput = document.getElementById("newPass");
+        const confirmPasswordInput = document.getElementById("confirmPass");
+        const data = {
+            old_password : oldPasswordInput.value.trim(),
+            new_password : newPasswordInput.value.trim(),
+            confirm_password : confirmPasswordInput.value.trim(),
+        }
+        const token = localStorage.getItem("access_token");
+        fetch(`${baseUrl}/updatePassword/`, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then(handleResponse)
+            .then((response) => {
+                alert(response.message);
+                document.location.reload();
+            })
+            .catch(showError);
+    });
+
     getTeachersData();
     setupSearchInput();
-    toggleEditMode(false);
 });
