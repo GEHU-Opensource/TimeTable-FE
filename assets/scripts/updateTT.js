@@ -52,14 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     courseDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedDepartment = departments.find(department => department.name === departmentDropdown.value);
         const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
         clearDropdown(branchDropdown);
         populateDropdown(branchDropdown, selectedCourse?.branches || [], "name", "name");
     });
 
     branchDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedDepartment = departments.find(department => department.name === departmentDropdown.value);
         const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
         const selectedBranch = selectedCourse?.branches.find(branch => branch.name === branchDropdown.value);
         clearDropdown(yearDropdown);
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     yearDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedDepartment = departments.find(department => department.name === departmentDropdown.value);
         const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
         const selectedBranch = selectedCourse?.branches.find(branch => branch.name === branchDropdown.value);
         const selectedYear = selectedBranch?.years.find(year => year.year === yearDropdown.value);
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = {
             department: departmentDropdown.value,
             course: courseDropdown.value,
-            branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+            branch: branchDropdown.value,
             year: yearDropdown.value,
             semester: semesterDropdown.value,
             ttFile: fileInput.files[0],

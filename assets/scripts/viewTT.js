@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     courseDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     branchDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     yearDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = {
             department: departmentDropdown.value,
             course: courseDropdown.value,
-            branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+            branch: branchDropdown.value,
             year: yearDropdown.value,
             semester: semesterDropdown.value,
         };
