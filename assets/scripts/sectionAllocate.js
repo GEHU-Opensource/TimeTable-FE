@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const branchDropdown = document.getElementById("branch");
     const yearDropdown = document.getElementById("year");
     const semesterDropdown = document.getElementById("semester");
+    const sectionInput = document.getElementById("sections");
     const allocateButton = document.getElementById("allocate");
     const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
@@ -55,14 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     courseDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedDepartment = departments.find(department => department.name === departmentDropdown.value);
         const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
         clearDropdown(branchDropdown);
         populateDropdown(branchDropdown, selectedCourse?.branches || [], "name", "name");
     });
 
     branchDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedDepartment = departments.find(department => department.name === departmentDropdown.value);
         const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
         const selectedBranch = selectedCourse?.branches.find(branch => branch.name === branchDropdown.value);
         clearDropdown(yearDropdown);
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     yearDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(dept => dept.name === departmentDropdown.value);
+        const selectedDepartment = departments.find(department => department.name === departmentDropdown.value);
         const selectedCourse = selectedDepartment?.courses.find(course => course.name === courseDropdown.value);
         const selectedBranch = selectedCourse?.branches.find(branch => branch.name === branchDropdown.value);
         const selectedYear = selectedBranch?.years.find(year => year.year === yearDropdown.value);
@@ -82,10 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = {
             department: departmentDropdown.value,
             course: courseDropdown.value,
-            branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+            branch: branchDropdown.value,
             year: yearDropdown.value,
             semester: semesterDropdown.value,
-            sections: fileInput.files[0],
+            sections: sectionInput,
+            student_data: fileInput.files[0],
         };
         if(!data.department || !data.course || !data.year || !data.semester) {
             alert("Fill the Details!");
@@ -99,14 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("Form Data:", data);
         alert("Updated successfully!");
-
-        
-        if(branch==="") {
-            // 
-        }
-        else {
-            
-        }
         
         const file = generateTT; // API:departmen/course/branch/year/semester
 

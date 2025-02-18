@@ -94,7 +94,7 @@ h2 {
     color: #555;
 }
 
-.form-group select {
+.form-group input, select {
     width: 100%;
     padding: 10px;
     font-size: 14px;
@@ -120,7 +120,7 @@ h2 {
     background-color: #218838;
 }
 
-select:focus {
+input:focus, select:focus {
     border-color: #28a745;
     box-shadow: 0 0 5px rgba(40,167,69,0.8);
     outline: none;
