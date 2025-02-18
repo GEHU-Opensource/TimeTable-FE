@@ -5,6 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const branchDropdown = document.getElementById("branch");
     const yearDropdown = document.getElementById("year");
     const semesterDropdown = document.getElementById("semester");
+    const professorWeeklyLoad = document.getElementById("professorLoad");
+    const adjunctWeeklyLoad = document.getElementById("adjunctLoad");
+    const hodWeeklyLoad = document.getElementById("hodLoad");
+    const assistantProfessorWeeklyLoad = document.getElementById("assistant_professorLoad");
+    const lecturerWeeklyLoad = document.getElementById("lecturerLoad");
+    const labAssistantWeeklyLoad = document.getElementById("lab_assistantLoad");
     const generateButton = document.getElementById("generateTT");
     const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
@@ -57,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     courseDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -73,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     branchDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -87,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     yearDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -177,6 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
             branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
             year: yearDropdown.value,
             semester: semesterDropdown.value,
+            weekly_workload: {
+                professor: professorWeeklyLoad.value,
+                adjunct: adjunctWeeklyLoad.value,
+                hod: hodWeeklyLoad.value,
+                assistant_professor: assistantProfessorWeeklyLoad.value,
+                lecturer: lecturerWeeklyLoad.value,
+                lab_assistant: labAssistantWeeklyLoad.value,
+            },
             time_slots: []
         };
 
@@ -202,11 +216,28 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Fill in all the details");
             return;
         }
+        if (
+            data.weekly_workload.professor === "0" ||
+            data.weekly_workload.adjunct === "0" ||
+            data.weekly_workload.hod === "0" ||
+            data.weekly_workload.assistant_professor === "0" ||
+            data.weekly_workload.lecturer === "0" ||
+            data.weekly_workload.lab_assistant === "0"
+        ) {
+            console.log(data.weekly_workload.professor);
+            console.log(data.weekly_workload.adjunct);
+            console.log(data.weekly_workload.hod);
+            console.log(data.weekly_workload.assistant_professor);
+            console.log(data.weekly_workload.lecturer);
+            console.log(data.weekly_workload.lab_assistant);
+            alert("Enter the Weekly Load!");
+            return;
+        }
+        
         if (data.time_slots.length === 0) {
             alert("Add at least one time slot!");
             return;
         }
-
         const token = localStorage.getItem("access_token");
 
         fetch(`${baseUrl}/generateTimetable/`, {
