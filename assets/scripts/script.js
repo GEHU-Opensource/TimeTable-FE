@@ -31,9 +31,9 @@ loginForm.addEventListener("submit", async (e) => {
             localStorage.setItem("refresh_token", data.refresh_token);
             localStorage.setItem("sessionExpiresAt", expirationTime);
             if (data.teacher.teacher_type === "faculty") {
-                window.location.href = "/faculty/profile.html";
+                window.location.href = "/faculty/timetable.html";
             } else if (data.teacher.teacher_type === "hod") {
-                window.location.href = "/hod/profile.html";
+                window.location.href = "/hod/timetable.html";
             } else {
                 window.location.href = "/admin/subject.html";
             }
