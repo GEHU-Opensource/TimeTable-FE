@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     courseDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     branchDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     yearDropdown.addEventListener("change", function () {
         const selectedDepartment = departments.find(
-            (dept) => dept.name === departmentDropdown.value
+            (department) => department.name === departmentDropdown.value
         );
         const selectedCourse = selectedDepartment?.courses.find(
             (course) => course.name === courseDropdown.value
@@ -147,9 +147,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     </td>
                     <td>
                         <select class="subject-special" disabled>
-                            <option value="1" ${subject.is_special_subject === "No" ? "selected" : ""
+                            <option value="No" ${subject.is_special_subject === "No" ? "selected" : ""
                 }>No</option>
-                            <option value="2" ${subject.is_special_subject === "Yes" ? "selected" : ""
+                            <option value="Yes" ${subject.is_special_subject === "Yes" ? "selected" : ""
+                }>Yes</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="is-Lab" disabled>
+                            <option value="No" ${subject.is_lab === "No" ? "selected" : ""
+                }>No</option>
+                            <option value="Yes" ${subject.is_lab === "Yes" ? "selected" : ""
                 }>Yes</option>
                         </select>
                     </td>
@@ -171,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const selectedBranch = branchDropdown.value;
                     const selectedSemester = semesterDropdown.value;
                     const data = {
-                        dept: selectedDepartment,
+                        department: selectedDepartment,
                         course: selectedCourse,
                         branch: selectedBranch,
                         semester: selectedSemester,
@@ -260,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedBranch = branchDropdown.value;
         const selectedSemester = semesterDropdown.value;
         const params = new URLSearchParams({
-            dept: selectedDepartment,
+            department: selectedDepartment,
             course: selectedCourse,
             branch: selectedBranch,
             semester: selectedSemester,
@@ -329,6 +337,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         <option value="Yes">Yes</option>
                     </select>
                 </td>
+                <td>
+                    <select class="is-Lab">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </td>
                 <td><button class="delete-btn">Delete</button></td>
             `;
         const deleteButton = newRow.querySelector(".delete-btn");
@@ -359,6 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const subjectCreditInput = row.querySelector(".subject-credit");
             const subjectWeeklyInput = row.querySelector(".subject-weekly");
             const specialSubjectInput = row.querySelector(".subject-special");
+            const isLabInput = row.querySelector(".is-Lab");
 
             if (subjectCodeInput && subjectNameInput && subjectCreditInput) {
                 const subjectCode = subjectCodeInput.value.trim();
@@ -366,12 +381,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const subjectCredit = subjectCreditInput.value.trim();
                 const subjectWeekly = subjectWeeklyInput.value.trim();
                 const specialSubject = specialSubjectInput.value.trim();
+                const isLab = isLabInput.value.trim();
 
                 if (subjectCode && subjectName && subjectCredit) {
                     const subject = {
-                        dept: selectedDepartment,
+                        department: selectedDepartment,
                         course: selectedCourse,
-                        branch: selectedBranch !== "No Branch" ? selectedBranch : "",
+                        branch: selectedBranch,
                         year: selectedYear,
                         semester: selectedSemester,
                         subject_name: subjectName,
@@ -379,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         credits: subjectCredit,
                         weekly_quota_limit: subjectWeekly,
                         is_special_subject: specialSubject,
+                        is_lab: isLab,
                     };
                     data.push(subject);
                 } else {
