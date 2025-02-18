@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = {
             department: departmentDropdown.value,
             course: courseDropdown.value,
-            branch: branchDropdown.value !== "No Branch" ? branchDropdown.value : "",
+            branch: branchDropdown.value,
             year: yearDropdown.value,
             semester: semesterDropdown.value,
             weekly_workload: {
