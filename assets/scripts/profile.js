@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(handleResponse)
         .then(data => {
             originalData = { ...data };
-            if(originalData.preferred_subjects.length===0) {
+            if(originalData.assigned_subjects.length===0) {
                 document.querySelector(".inRequest").style.display = "block";
             }
             else {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             populateProfileForm(data);
             loadDepartments(data.department);
-            loadSubjects(data.preferred_subjects || []);
+            loadSubjects(data.assigned_subjects || []);
             const teacherCode = data.teacher_code;
             profileHead.textContent = `Profile ( ${teacherCode} )`;
         })
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleEditMode(enable) {
         const inputs = profileForm.querySelectorAll("input, select");
-        if(originalData && originalData.preferred_subjects.length === 0) {
+        if(originalData && originalData.assigned_subjects.length === 0) {
             inputs.forEach(input => {
                 if (!["email", "name"].includes(input.id)) {
                     input.disabled = !enable;
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (confirm("You have unsaved changes. Discard them?")) {
                 populateProfileForm(originalData);
                 loadDepartments(originalData.department);
-                loadSubjects(originalData.preferred_subjects || []);
+                loadSubjects(originalData.assigned_subjects || []);
                 toggleEditMode(false);
             } else {
                 toggleEditMode(false);
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
             department: profileForm.elements["department"].value,
             designation: profileForm.elements["designation"].value,
             working_days: profileForm.elements["working_days"].value,
-            preferred_subjects: selectedSubjects,
+            assigned_subjects: selectedSubjects,
         };
         if(confirm("Are you sure to Submit these details?"))
             submitData(updatedData);
