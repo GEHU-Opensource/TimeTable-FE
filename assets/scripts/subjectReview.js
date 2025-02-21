@@ -35,7 +35,6 @@ function getPendingRequests() {
         })
         .then(handleResponse)
         .then(data => {
-            console.log(data);
             if (Object.keys(data.pending_requests).length === 0) {
                 document.querySelector(".request-container").innerHTML = `<p class="emptyRequests">No subject is pending for approval.</p>`;
                 return;
@@ -50,7 +49,6 @@ function getPendingRequests() {
 function loadPendingSubjects(requests) {
     const requestContainer = document.querySelector(".request-container");
     requestContainer.innerHTML = "";
-
     requests.subjects.forEach(({ subject_name, subject_code }) => {
         populateSubjectCard(subject_name, subject_code, requests);
     });
@@ -75,6 +73,10 @@ function createApproveButton(requests) {
     });
 }
 
+function isValidTeachersSelection(selectedTeachersMap) {
+    return Object.values(selectedTeachersMap).every(teachers => teachers.length > 0);
+}
+
 function getSelectedTeachersMap(requests) {
     const selectedTeachersMap = {};
     document.querySelectorAll(".subject-container").forEach(subjectDiv => {
@@ -82,19 +84,27 @@ function getSelectedTeachersMap(requests) {
         const selectedTeachers = [];
 
         subjectDiv.querySelectorAll(".selected-teachers .selected-teacher").forEach(span => {
-            const teacherName = span.textContent;
-            const teacherData = requests.teachers.find(t => t.teacher_name === teacherName);
-            if (teacherData) selectedTeachers.push(teacherData.teacher_name);
+            const teacherNameAndCode = span.textContent;
+            let teacherCode = null;
+            // Extract teacher code if it contains "("
+            if (teacherNameAndCode.includes("(")) {
+                teacherCode = teacherNameAndCode.substring(
+                    teacherNameAndCode.indexOf('(') + 1, 
+                    teacherNameAndCode.indexOf(')')
+                );
+            } else {
+                teacherCode = teacherNameAndCode; // If no parentheses, keep original text
+            }
+            const teacherData = requests.teachers.find(t => t.teacher_code === teacherCode);
+            
+            if (teacherData) selectedTeachers.push(teacherData.teacher_code)
+            else selectedTeachers.push(teacherCode);
         });
 
         selectedTeachersMap[subjectCode] = selectedTeachers;
     });
 
     return selectedTeachersMap;
-}
-
-function isValidTeachersSelection(selectedTeachersMap) {
-    return Object.values(selectedTeachersMap).every(teachers => teachers.length > 0);
 }
 
 const searchSubject = document.getElementById("pendingSubjectSearch");
@@ -122,8 +132,12 @@ function createSubjectCard(subject_name, subject_code, requests) {
     const subjectDiv = document.createElement("div");
     subjectDiv.classList.add("subject-container");
 
-    const assignedTeachers = requests.pending_requests[subject_code] || [];
-
+    const teachersLabel = requests.pending_requests[subject_code] || [];
+    const assignedTeachers = teachersLabel.map(obj => { 
+        const teacherCode = Object.keys(obj)[0]; // Extract teacher code
+        const teacherName = obj[teacherCode]; // Extract teacher name
+        return `${teacherName} (${teacherCode})`;
+    }).filter(Boolean);
     subjectDiv.innerHTML = `
         <label class="subject">${subject_name}<br>(${subject_code})</label>
         <div class="teacher-selection">
@@ -147,11 +161,9 @@ function createSubjectCard(subject_name, subject_code, requests) {
 }
 
 function populateDropdown(assignedTeachers, requests, dropdown) {
-    const allTeachers = requests.teachers.map(t => t.teacher_name);
+    const allTeachers = requests.teachers.map(t => t.teacher_name+" ("+t.teacher_code+")");
     assignedTeachers.forEach(teacher => dropdown.appendChild(createTeacherCheckbox(teacher, true)));
-    console.log(assignedTeachers);
-    console.log(allTeachers);
-    allTeachers.filter(t => !assignedTeachers.includes(t)).forEach(teacher => dropdown.appendChild(createTeacherCheckbox(teacher, false)));
+    allTeachers.filter(t => !assignedTeachers.includes(t)).forEach(teacher_code => dropdown.appendChild(createTeacherCheckbox(teacher_code, false)));
 }
 
 function createTeacherCheckbox(teacher, checked) {
@@ -216,7 +228,6 @@ function attachDropdownListeners(searchInput, dropdown, selectedTeachersDiv) {
 
 function submitApproval(selectedTeachersMap) {
     const token = localStorage.getItem("access_token");
-    console.log(selectedTeachersMap);
     fetch(`${baseUrl}/approveSubjectRequests/`, {
         method: "POST",
         headers: {
@@ -263,11 +274,14 @@ function getApprovedSubjects() {
         })
         .then(handleResponse)
         .then(data => {
-            console.log(data);
             renderApprovedSubjects(data);
             approved = { ...data };
         })
         .catch(showError);
+}
+
+function getTeachersNames(teachersArray) {
+    return teachersArray.map(teacherObj => Object.values(teacherObj)[0]); // Extracts the name from each object
 }
 
 function renderApprovedSubjects(approvedData) {
@@ -305,7 +319,8 @@ function renderApprovedSubjects(approvedData) {
 
     let lastSubject = null;
     approvedData.forEach(({ subject_name, subject_code, teachers }) => {
-        const subjectDiv = createApprovedSubjectCard(subject_name, subject_code, teachers, lastSubject);
+        const teachersName = getTeachersNames(teachers);
+        const subjectDiv = createApprovedSubjectCard(subject_name, subject_code, teachersName, lastSubject);
         lastSubject = subjectDiv ? { subject_name, subject_code } : lastSubject;
         tableBody.appendChild(subjectDiv);
     });
