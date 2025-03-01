@@ -68,21 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleEditMode(enable) {
         const inputs = profileForm.querySelectorAll("input, select");
-        if(originalData && originalData.assigned_subjects.length === 0) {
-            inputs.forEach(input => {
-                if (!["email", "name"].includes(input.id)) {
-                    input.disabled = !enable;
-                }
-            });
-        }
-        else {
-            inputs.forEach(input => {
-                if (!["email", "name","searchSubjects"].includes(input.id)) {
-                    input.disabled = !enable;
-                }
-            });
-        }
-    
+        inputs.forEach(input => {
+            if (!["email", "name"].includes(input.id)) {
+                input.disabled = !enable;
+            }
+        });
         submitBtn.disabled = !enable;
         editButton.querySelector("i").classList.toggle("fa-pencil", !enable);
         editButton.querySelector("i").classList.toggle("fa-times", enable);
@@ -267,45 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
-    document.getElementById("show-password").addEventListener("click", function () {
-        var passwordFields = document.querySelectorAll(".password");
-        passwordFields.forEach(function(field) {
-            if (field.type === "password") {
-                field.type = "text";
-            }
-            else {
-                field.type = "password";
-            }
-        });
-    });
-
-    document.getElementById("update-form").addEventListener("submit", (event) => {
-        event.preventDefault();
-        const oldPasswordInput = document.getElementById("oldPass");
-        const newPasswordInput = document.getElementById("newPass");
-        const confirmPasswordInput = document.getElementById("confirmPass");
-        const data = {
-            old_password : oldPasswordInput.value.trim(),
-            new_password : newPasswordInput.value.trim(),
-            confirm_password : confirmPasswordInput.value.trim(),
-        }
-        const token = localStorage.getItem("access_token");
-        fetch(`${baseUrl}/updatePassword/`, {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        })
-            .then(handleResponse)
-            .then((response) => {
-                alert(response.message);
-                document.location.reload();
-            })
-            .catch(showError);
-    });
 
     getTeachersData();
     setupSearchInput();
