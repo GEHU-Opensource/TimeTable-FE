@@ -7,11 +7,18 @@ const searchBar = document.querySelector(".searchBar");
 let requests = {};
 let approved = {};
 
+// Event Listeners
 logoutBtn.addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "../index.html";
 });
 
+const searchSubject = document.getElementById("pendingSubjectSearch");
+searchSubject.addEventListener("input", function () {
+    searchPendingSubjects(this.value.toLowerCase());
+});
+
+// Tab Functions
 function showTab(tabId) {
     toggleActiveClass(tabId);
     tabId === "pending" ? getPendingRequests() : getApprovedSubjects();
@@ -24,6 +31,7 @@ function toggleActiveClass(tabId) {
     document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add("active");
 }
 
+// Pending Requests Functions
 function getPendingRequests() {
     const token = localStorage.getItem("access_token");
     fetch(`${baseUrl}/getPendingRequests/`, {
@@ -52,77 +60,30 @@ function loadPendingSubjects(requests) {
     requests.subjects.forEach(({ subject_name, subject_code }) => {
         populateSubjectCard(subject_name, subject_code, requests);
     });
-
-    // Add Approve button centered at the bottom
     createApproveButton(requests);
 }
 
-function createApproveButton(requests) {
-    const submitSection = document.createElement("div");
-    submitSection.classList.add("submitBtn");
-    submitSection.innerHTML = `<button type="submit" id="approveBtn">Approve</button>`;
-    document.getElementById("approveButton").innerHTML = "";
-    document.getElementById("approveButton").appendChild(submitSection);
-    document.getElementById("approveBtn").addEventListener("click", () => {
-        const selectedTeachersMap = getSelectedTeachersMap(requests);
-        if (!isValidTeachersSelection(selectedTeachersMap)) {
-            alert(`Please select at least one Teacher for each Subject!`);
-            return;
-        }
-        submitApproval(selectedTeachersMap);
-    });
-}
-
-function isValidTeachersSelection(selectedTeachersMap) {
-    return Object.values(selectedTeachersMap).every(teachers => teachers.length > 0);
-}
-
-function getSelectedTeachersMap(requests) {
-    const selectedTeachersMap = {};
-    document.querySelectorAll(".subject-container").forEach(subjectDiv => {
-        const subjectCode = subjectDiv.querySelector(".subject").textContent.match(/\((.*?)\)/)[1];
-        const selectedTeachers = [];
-
-        subjectDiv.querySelectorAll(".selected-teachers .selected-teacher").forEach(span => {
-            const teacherNameAndCode = span.textContent;
-            let teacherCode = null;
-            // Extract teacher code if it contains "("
-            if (teacherNameAndCode.includes("(")) {
-                teacherCode = teacherNameAndCode.substring(
-                    teacherNameAndCode.indexOf('(') + 1, 
-                    teacherNameAndCode.indexOf(')')
-                );
-            } else {
-                teacherCode = teacherNameAndCode; // If no parentheses, keep original text
-            }
-            const teacherData = requests.teachers.find(t => t.teacher_code === teacherCode);
-            
-            if (teacherData) selectedTeachers.push(teacherData.teacher_code)
-            else selectedTeachers.push(teacherCode);
-        });
-
-        selectedTeachersMap[subjectCode] = selectedTeachers;
-    });
-
-    return selectedTeachersMap;
-}
-
-const searchSubject = document.getElementById("pendingSubjectSearch");
-searchSubject.addEventListener("input", function () {
-    const searchValue = this.value.toLowerCase();
+function searchPendingSubjects(searchValue) {
     const filteredSubjects = requests.subjects.filter(({ subject_name, subject_code }) => 
         subject_name.toLowerCase().includes(searchValue) || subject_code.toLowerCase().includes(searchValue)
     );
 
-    // Clear the existing subjects
-    document.querySelector(".request-container").innerHTML = "";
+    const requestContainer = document.querySelector(".request-container");
+    requestContainer.innerHTML = "";
+    const approveBtn = document.getElementById("approveBtn");
 
-    // Populate the filtered subjects
-    filteredSubjects.forEach(({ subject_name, subject_code }) => {
-        populateSubjectCard(subject_name, subject_code, requests);
-    });
-});
+    if (filteredSubjects.length === 0) {
+        requestContainer.innerHTML = `<p class="emptyRequests">No subjects found.</p>`;
+        approveBtn.style.display = "none";
+    } else {
+        filteredSubjects.forEach(({ subject_name, subject_code }) => {
+            populateSubjectCard(subject_name, subject_code, requests);
+        });
+        approveBtn.style.display = "inline-block";
+    }
+}
 
+// Subject Card Functions
 function populateSubjectCard(subject_name, subject_code, requests) {
     const subjectDiv = createSubjectCard(subject_name, subject_code, requests);
     document.querySelector(".request-container").appendChild(subjectDiv);
@@ -134,10 +95,11 @@ function createSubjectCard(subject_name, subject_code, requests) {
 
     const teachersLabel = requests.pending_requests[subject_code] || [];
     const assignedTeachers = teachersLabel.map(obj => { 
-        const teacherCode = Object.keys(obj)[0]; // Extract teacher code
-        const teacherName = obj[teacherCode]; // Extract teacher name
+        const teacherCode = Object.keys(obj)[0];
+        const teacherName = obj[teacherCode];
         return `${teacherName} (${teacherCode})`;
     }).filter(Boolean);
+
     subjectDiv.innerHTML = `
         <label class="subject">${subject_name}<br>(${subject_code})</label>
         <div class="teacher-selection">
@@ -152,12 +114,14 @@ function createSubjectCard(subject_name, subject_code, requests) {
     const dropdown = subjectDiv.querySelector(".dropdown-content");
     const selectedTeachersDiv = subjectDiv.querySelector(".selected-teachers");
 
+    setupTeacherDropdown(assignedTeachers, requests, dropdown, selectedTeachersDiv, searchInput);
+    return subjectDiv;
+}
+
+function setupTeacherDropdown(assignedTeachers, requests, dropdown, selectedTeachersDiv, searchInput) {
     populateDropdown(assignedTeachers, requests, dropdown);
     populateSelectedTeachers(assignedTeachers, selectedTeachersDiv);
-
     attachDropdownListeners(searchInput, dropdown, selectedTeachersDiv);
-
-    return subjectDiv;
 }
 
 function populateDropdown(assignedTeachers, requests, dropdown) {
@@ -190,33 +154,11 @@ function attachDropdownListeners(searchInput, dropdown, selectedTeachersDiv) {
     });
 
     dropdown.addEventListener("change", (event) => {
-        const checkbox = event.target;
-        if (checkbox.checked) {
-            const teacherTag = document.createElement("span");
-            teacherTag.textContent = checkbox.value;
-            teacherTag.classList.add("selected-teacher");
-            selectedTeachersDiv.appendChild(teacherTag);
-        } else {
-            Array.from(selectedTeachersDiv.children).forEach(span => {
-                if (span.textContent === checkbox.value) {
-                    span.remove();
-                }
-            });
-        }
+        updateSelectedTeachers(event.target, selectedTeachersDiv);
     });
 
     searchInput.addEventListener("input", function () {
-        const searchValue = this.value.toLowerCase();
-        const labels = dropdown.querySelectorAll("label");
-        let hasVisibleOption = false;
-
-        labels.forEach((label) => {
-            const text = label.textContent.toLowerCase();
-            label.style.display = text.includes(searchValue) ? "flex" : "none";
-            if (text.includes(searchValue)) hasVisibleOption = true;
-        });
-
-        dropdown.style.display = hasVisibleOption ? "block" : "none";
+        filterDropdownOptions(this.value.toLowerCase(), dropdown);
     });
 
     document.addEventListener("click", function (event) {
@@ -224,6 +166,88 @@ function attachDropdownListeners(searchInput, dropdown, selectedTeachersDiv) {
             dropdown.style.display = "none";
         }
     });
+}
+
+function updateSelectedTeachers(checkbox, selectedTeachersDiv) {
+    if (checkbox.checked) {
+        const teacherTag = document.createElement("span");
+        teacherTag.textContent = checkbox.value;
+        teacherTag.classList.add("selected-teacher");
+        selectedTeachersDiv.appendChild(teacherTag);
+    } else {
+        Array.from(selectedTeachersDiv.children).forEach(span => {
+            if (span.textContent === checkbox.value) {
+                span.remove();
+            }
+        });
+    }
+}
+
+function filterDropdownOptions(searchValue, dropdown) {
+    const labels = dropdown.querySelectorAll("label");
+    let hasVisibleOption = false;
+
+    labels.forEach((label) => {
+        const text = label.textContent.toLowerCase();
+        label.style.display = text.includes(searchValue) ? "flex" : "none";
+        if (text.includes(searchValue)) hasVisibleOption = true;
+    });
+
+    dropdown.style.display = hasVisibleOption ? "block" : "none";
+}
+
+// Approval Functions
+function createApproveButton(requests) {
+    const submitSection = document.createElement("div");
+    submitSection.classList.add("submitBtn");
+    submitSection.innerHTML = `<button type="submit" id="approveBtn">Approve</button>`;
+    document.getElementById("approveButton").innerHTML = "";
+    document.getElementById("approveButton").appendChild(submitSection);
+    document.getElementById("approveBtn").addEventListener("click", () => {
+        handleApprovalClick(requests);
+    });
+}
+
+function handleApprovalClick(requests) {
+    const selectedTeachersMap = getSelectedTeachersMap(requests);
+    if (!isValidTeachersSelection(selectedTeachersMap)) {
+        alert(`Please select at least one Teacher for each Subject!`);
+        return;
+    }
+    submitApproval(selectedTeachersMap);
+}
+
+function getSelectedTeachersMap(requests) {
+    const selectedTeachersMap = {};
+    document.querySelectorAll(".subject-container").forEach(subjectDiv => {
+        const subjectCode = subjectDiv.querySelector(".subject").textContent.match(/\((.*?)\)/)[1];
+        const selectedTeachers = [];
+
+        subjectDiv.querySelectorAll(".selected-teachers .selected-teacher").forEach(span => {
+            const teacherNameAndCode = span.textContent;
+            let teacherCode = null;
+            if (teacherNameAndCode.includes("(")) {
+                teacherCode = teacherNameAndCode.substring(
+                    teacherNameAndCode.indexOf('(') + 1, 
+                    teacherNameAndCode.indexOf(')')
+                );
+            } else {
+                teacherCode = teacherNameAndCode;
+            }
+            const teacherData = requests.teachers.find(t => t.teacher_code === teacherCode);
+            
+            if (teacherData) selectedTeachers.push(teacherData.teacher_code)
+            else selectedTeachers.push(teacherCode);
+        });
+
+        selectedTeachersMap[subjectCode] = selectedTeachers;
+    });
+
+    return selectedTeachersMap;
+}
+
+function isValidTeachersSelection(selectedTeachersMap) {
+    return Object.values(selectedTeachersMap).every(teachers => teachers.length > 0);
 }
 
 function submitApproval(selectedTeachersMap) {
@@ -247,22 +271,7 @@ function submitApproval(selectedTeachersMap) {
     });
 }
 
-function handleResponse(response) {
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    return response.json();
-}
-
-function showError(error) {
-    console.error("Error: ", error);
-
-    if (error.message.includes("401")) {
-        alert("Session expired. Redirecting to login...");
-        window.location.href = "../index.html";
-    } else {
-        alert(error.message || "An error occurred.");
-    }
-}
-
+// Approved Subjects Functions
 function getApprovedSubjects() {
     const token = localStorage.getItem("access_token");
     fetch(`${baseUrl}/getApprovedSubjects/`, {
@@ -276,12 +285,9 @@ function getApprovedSubjects() {
         .then(data => {
             renderApprovedSubjects(data);
             approved = { ...data };
+            console.log(approved);
         })
         .catch(showError);
-}
-
-function getTeachersNames(teachersArray) {
-    return teachersArray.map(teacherObj => Object.values(teacherObj)[0]); // Extracts the name from each object
 }
 
 function renderApprovedSubjects(approvedData) {
@@ -332,11 +338,18 @@ function renderApprovedSubjects(approvedData) {
     addSearchFilters();
 }
 
+function getTeachersNames(teachersArray) {
+    return teachersArray.map(teacherObj => {
+        const teacherCode = Object.keys(teacherObj)[0];
+        const teacherName = teacherObj[teacherCode];
+        return `${teacherName} (${teacherCode})`;
+    });
+}
+
 function createApprovedSubjectCard(subject_name, subject_code, teachers, lastSubject) {
     const subjectDiv = document.createElement("tr");
 
     if (lastSubject && lastSubject.subject_name === subject_name && lastSubject.subject_code === subject_code) {
-        // Merge this row with the previous one by not rendering subject name/code again
         subjectDiv.innerHTML = `
             <td></td>
             <td></td>
@@ -397,4 +410,21 @@ function filterTable() {
             row.style.display = "none";
         }
     });
+}
+
+// Utility Functions
+function handleResponse(response) {
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    return response.json();
+}
+
+function showError(error) {
+    console.error("Error: ", error);
+
+    if (error.message.includes("401")) {
+        alert("Session expired. Redirecting to login...");
+        window.location.href = "../index.html";
+    } else {
+        alert(error.message || "An error occurred.");
+    }
 }
