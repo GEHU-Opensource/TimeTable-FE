@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin | Class Details</title>
     <link rel="shortcut icon" href="../assets/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/styles/class.css" />
     <script>
         async function validateSession() {
@@ -104,6 +105,10 @@
         <!-- Existing Class Data Container -->
         <section id="existingClassData">
             <h2>Existing Class Data</h2>
+            <div class="search-container">
+                <input type="text" id="classSearch" placeholder="Search classes...">
+            </div>
+            <p id="noRoomsMessage">No rooms found</p>
             <table id="existingClassTable">
                 <thead>
                     <tr>
