@@ -11,6 +11,47 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSubjects();
     setupSearchInput();
     setupFormSubmission();
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function attachNavbarEventListeners() {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "../index.html";
+            });
+        }
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
+    loadComponent("footer", "../components/footer.html");
+    setTimeout(highlightActiveLink, 100);
 });
 
 function loadDepartments() {
@@ -38,7 +79,7 @@ function loadSubjects() {
                 checkbox.type = "checkbox";
                 checkbox.value = subject.subject_name;
                 label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(` ${subject.subject_name}`));
+                label.appendChild(document.createTextNode(` ${subject.subject_name} (${subject.subject_code})`));
                 dropdownContent.appendChild(label);
 
                 checkbox.addEventListener("change", updateSelectedSubjects);
@@ -172,27 +213,19 @@ function submitFormData(data) {
         .then((responseData) => {
             // Hide the loading spinner
             document.getElementById("loading-spinner").style.display = "none";
-
-            // Handle success
             if (responseData.message) {
-                alert(responseData.message); // Show success message from backend
+                alert(responseData.message);
             }
-
-            // Reset form fields and hide selected subjects container
             form.reset();
             selectedSubjectsContainer.style.display = "none";
         })
         .catch((error) => {
-            // Hide the loading spinner in case of an error
             document.getElementById("loading-spinner").style.display = "none";
-
-            // Display error messages from response
             if (error.message.includes("User with this email already exists.")) {
                 alert("This teacher's email already exists. Please try again.");
             } else {
                 alert("Failed to submit data. Please try again.");
             }
-
             console.error("Error posting data:", error);
         });
 }

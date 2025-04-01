@@ -38,7 +38,6 @@ loginForm.addEventListener("submit", async (e) => {
                 window.location.href = "/admin/subject.html";
             }
         } else {
-            // Alert for invalid credentials
             alert(data.detail || "Invalid credentials. Please try again.");
             errorMessage.textContent = data.detail || "Invalid credentials.";
         }
@@ -63,4 +62,36 @@ function togglePassword() {
 
 document.addEventListener("DOMContentLoaded", ()=> {
     localStorage.clear();
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
+    
+    loadComponent("footer", "../components/footer.html");
+    setTimeout(highlightActiveLink, 100);
 });
