@@ -1,4 +1,47 @@
 document.addEventListener("DOMContentLoaded", () => {
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function attachNavbarEventListeners() {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "../index.html";
+            });
+        }
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
+    loadComponent("navbar-admin", "../components/admin_navbar.html");
+    loadComponent("footer", "../components/footer.html");
+    setTimeout(highlightActiveLink, 100);
+
     const baseUrl = BE_URL;
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");
@@ -15,12 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
     const addTimeSlotButton = document.getElementById("add-time-slot");
-    const logoutBtn = document.querySelector(".logout-btn");
-
-    logoutBtn.addEventListener("click", () => {
-        localStorage.clear();
-        window.location.href = "../index.html";
-    });
 
     function clearDropdown(dropdown) {
         dropdown.innerHTML = "";

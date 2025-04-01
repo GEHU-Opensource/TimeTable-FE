@@ -1,4 +1,47 @@
 document.addEventListener("DOMContentLoaded", () => {
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function attachNavbarEventListeners() {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "../index.html";
+            });
+        }
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
+    loadComponent("navbar-admin", "../components/admin_navbar.html");
+    loadComponent("footer", "../components/footer.html");
+    setTimeout(highlightActiveLink, 100);
+    
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");
     const branchDropdown = document.getElementById("branch");
@@ -12,11 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const baseUrl = BE_URL;
     const addSubjectBtn = document.getElementById("addSubjectBtn");
     const submitBtn = document.getElementById("submitBtn");
-    const logoutBtn = document.querySelector(".logout-btn");
-    logoutBtn.addEventListener("click", () => {
-        localStorage.clear();
-        window.location.href = "../index.html";
-    });
 
     if (typeof departments !== "undefined") {
         departments.forEach((department) => {
@@ -112,67 +150,57 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayExistingSubjects(subjects) {
         existingSubjectTableBody.innerHTML = "";
         subjects.forEach((subject) => {
+            console.log(subject);
             const row = document.createElement("tr");
             row.dataset.subjectId = subject.id;
             row.innerHTML = `
-                    <td><input type="text" class="subject-code" value="${subject.subject_code
-                }" disabled /></td>
-                    <td><input type="text" class="subject-name" value="${subject.subject_name
-                }" disabled /></td>
+                    <td><input type="text" class="subject-code" value="${subject.subject_code}" disabled /></td>
+                    <td><input type="text" class="subject-name" value="${subject.subject_name}" disabled /></td>
                     <td>
                         <select class="subject-credit" disabled>
-                            <option value="0" ${subject.credits === 0 ? "selected" : ""
-                }>0</option>
-                            <option value="1" ${subject.credits === 1 ? "selected" : ""
-                }>1</option>
-                            <option value="2" ${subject.credits === 2 ? "selected" : ""
-                }>2</option>
-                            <option value="3" ${subject.credits === 3 ? "selected" : ""
-                }>3</option>
-                            <option value="4" ${subject.credits === 4 ? "selected" : ""
-                }>4</option>
+                            <option value="0" ${subject.credits === 0 ? "selected" : ""}>0</option>
+                            <option value="1" ${subject.credits === 1 ? "selected" : ""}>1</option>
+                            <option value="2" ${subject.credits === 2 ? "selected" : ""}>2</option>
+                            <option value="3" ${subject.credits === 3 ? "selected" : ""}>3</option>
+                            <option value="4" ${subject.credits === 4 ? "selected" : ""}>4</option>
                         </select>
                     </td>
                     <td>
                         <select class="subject-weekly" disabled>
-                            <option value="1" ${subject.weekly_quota_limit === 1 ? "selected" : ""
-                }>1</option>
-                            <option value="2" ${subject.weekly_quota_limit === 2 ? "selected" : ""
-                }>2</option>
-                            <option value="3" ${subject.weekly_quota_limit === 3 ? "selected" : ""
-                }>3</option>
-                            <option value="4" ${subject.weekly_quota_limit === 4 ? "selected" : ""
-                }>4</option>
+                            <option value="1" ${subject.weekly_quota_limit === 1 ? "selected" : ""}>1</option>
+                            <option value="2" ${subject.weekly_quota_limit === 2 ? "selected" : ""}>2</option>
+                            <option value="3" ${subject.weekly_quota_limit === 3 ? "selected" : ""}>3</option>
+                            <option value="4" ${subject.weekly_quota_limit === 4 ? "selected" : ""}>4</option>
                         </select>
                     </td>
                     <td>
                         <select class="subject-special" disabled>
-                            <option value="No" ${subject.is_special_subject === "No" ? "selected" : ""
-                }>No</option>
-                            <option value="Yes" ${subject.is_special_subject === "Yes" ? "selected" : ""
-                }>Yes</option>
+                            <option value="No" ${subject.is_special_subject === "No" ? "selected" : ""}>No</option>
+                            <option value="Yes" ${subject.is_special_subject === "Yes" ? "selected" : ""}>Yes</option>
                         </select>
                     </td>
                     <td>
                         <select class="is-Lab" disabled>
-                            <option value="No" ${subject.is_lab === "No" ? "selected" : ""
-                }>No</option>
-                            <option value="Yes" ${subject.is_lab === "Yes" ? "selected" : ""
-                }>Yes</option>
+                            <option value="No" ${subject.is_lab === "No" ? "selected" : ""}>No</option>
+                            <option value="Yes" ${subject.is_lab === "Yes" ? "selected" : ""}>Yes</option>
                         </select>
                     </td>
                     <td>
-                        <button class="edit-btn">Edit</button>
-                        <button class="delete-btn">Delete</button>
+                        <button class="edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" title="Delete"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 `;
             const editButton = row.querySelector(".edit-btn");
             const deleteButton = row.querySelector(".delete-btn");
             const inputs = row.querySelectorAll("input, select");
+            
             editButton.addEventListener("click", () => {
-                if (editButton.textContent === "Edit") {
+                const icon = editButton.querySelector("i");
+                if (icon.classList.contains("fa-edit")) {
                     inputs.forEach((input) => (input.disabled = false));
-                    editButton.textContent = "Save";
+                    icon.classList.remove("fa-edit");
+                    icon.classList.add("fa-save");
+                    editButton.title = "Save";
                 } else {
                     const selectedDepartment = departmentDropdown.value;
                     const selectedCourse = courseDropdown.value;
@@ -187,14 +215,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     };
                     if (
                         inputs[0].value.trim() !== "" &&
-                        inputs[1].value.trim() !== "" &&
-                        inputs[2].value.trim() !== ""
+                        inputs[1].value.trim() !== ""
                     ) {
+                        const subjectCodeInput = row.querySelector(".subject-code");
+                        const subjectNameInput = row.querySelector(".subject-name");
+                        const subjectCreditInput = row.querySelector(".subject-credit");
+                        const subjectWeeklyInput = row.querySelector(".subject-weekly");
+                        const specialSubjectInput = row.querySelector(".subject-special");
+                        const isLabInput = row.querySelector(".is-Lab");
+                        const subjectCode = subjectCodeInput.value.trim();
+                        const subjectName = subjectNameInput.value.trim();
+                        const subjectCredit = subjectCreditInput.value.trim();
+                        const subjectWeekly = subjectWeeklyInput.value.trim();
+                        const specialSubject = specialSubjectInput.value.trim();
+                        const isLab = isLabInput.value.trim();
                         const editedsubject = {
-                            subject_code: inputs[0].value.trim(),
-                            subject_name: inputs[1].value.trim(),
-                            credits: inputs[2].value.trim(),
+                            subject_name: subjectName,
+                            subject_code: subjectCode,
+                            credits: subjectCredit,
+                            weekly_quota_limit: subjectWeekly,
+                            is_special_subject: specialSubject,
+                            is_lab: isLab,
                         };
+                        console.log(editedsubject);
                         data.subjects.push(editedsubject);
                         const token = localStorage.getItem("access_token");
                         fetch(`${baseUrl}/updateSubject/${row.dataset.subjectId}/`, {
@@ -217,7 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             })
                             .then((responseData) => {
                                 alert("Subject updation successful!");
-                                editButton.textContent = "Edit";
+                                icon.classList.remove("fa-save");
+                                icon.classList.add("fa-edit");
+                                editButton.title = "Edit";
                                 inputs.forEach((input) => (input.disabled = true));
                             })
                             .catch((error) => {
@@ -231,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
-
+    
             deleteButton.addEventListener("click", () => {
                 let result = confirm("Are you sure to Delete?");
                 if (result) {
@@ -297,6 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return response.json();
             })
             .then((fetchedSubjects) => {
+                console.log(fetchedSubjects);
                 displayExistingSubjects(fetchedSubjects);
             })
             .catch((error) => {
@@ -343,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <option value="Yes">Yes</option>
                     </select>
                 </td>
-                <td><button class="delete-btn">Delete</button></td>
+                <td><button class="delete-btn" title="Delete"><i class="fas fa-trash-alt"></i></button></td>
             `;
         const deleteButton = newRow.querySelector(".delete-btn");
         deleteButton.addEventListener("click", () => {
@@ -375,7 +421,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const specialSubjectInput = row.querySelector(".subject-special");
             const isLabInput = row.querySelector(".is-Lab");
 
-            if (subjectCodeInput && subjectNameInput && subjectCreditInput) {
+            if (subjectCodeInput && subjectNameInput) {
                 const subjectCode = subjectCodeInput.value.trim();
                 const subjectName = subjectNameInput.value.trim();
                 const subjectCredit = subjectCreditInput.value.trim();
@@ -398,11 +444,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         is_lab: isLab,
                     };
                     data.push(subject);
+                    console.log("submittedData",subject);
                 } else {
                     allFieldsFilled = false;
                 }
             }
         });
+        console.log(data);
 
         if (!allFieldsFilled) {
             alert("Please fill in all subject details.");
@@ -440,8 +488,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (serverResponse.message) {
                         alert(serverResponse.message);
                     }
-
-                    // Handle any errors specific to individual subjects
                     if (serverResponse.errors && serverResponse.errors.length > 0) {
                         let errorMessages = "";
                         serverResponse.errors.forEach((error) => {
@@ -449,13 +495,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             errorMessages += subjectError + "\n";
                         });
                         alert(`Error(s) while adding subjects:\n${errorMessages}`);
-                    }
-
-                    if (serverResponse.subjects) {
-                        console.log(
-                            "Subjects added successfully:",
-                            serverResponse.subjects
-                        );
                     }
 
                     getSubjectsButton.click();

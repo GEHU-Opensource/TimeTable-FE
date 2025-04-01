@@ -5,55 +5,6 @@ body {
     padding: 0;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-header img {
-    height: 70px;
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-    padding: 0;
-    margin: 0;
-}
-
-nav ul li {
-    list-style: none;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-nav ul li a:hover {
-    color: #666;
-}
-
-.logout-btn {
-    background-color: #d62828;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.logout-btn:hover {
-    background-color: #9a031e;
-}
-
 .nav-container {
     display: flex;
     justify-content: center;
@@ -179,7 +130,6 @@ button[type="submit"] {
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
-    text-align: center;
 }
 
 input:focus,
@@ -266,81 +216,6 @@ button[type="submit"]:hover {
     background-color: #218838;
 }
 
-/* .approved-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-
-.approved-table {
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-family: Arial, sans-serif;
-}
-
-.approved-table th,
-.approved-table td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: center;
-    max-width: 800px;
-}
-
-.approved-table th {
-    background-color: #f4f4f4;
-    color: #333;
-}
-
-.approved-table td {
-    background-color: #fff;
-}
-
-.approved-table th .subjectTable {
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.subjectTable {
-    max-width: 180px;
-}
-
-.approved-table td.empty {
-    background-color: #f9f9f9;
-    text-align: center;
-}
-
-.approved-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.approved-table tbody tr:nth-child(odd) {
-    background-color: #ffffff;
-}
-
-.approved-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-.emptyApproved {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #555;
-}
-
-.faculty-list {
-    padding-left: 20px;
-    list-style-type: disc;
-    margin: 0;
-    text-align: left;
-} */
-
-/* Approved Subjects Container */
 .approved-container {
     width: 100%;
     max-width: 1200px;

@@ -1,17 +1,79 @@
 document.addEventListener("DOMContentLoaded", function () {
     showTab("pending");
+    
+    let originalData = {};
+
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function attachNavbarEventListeners() {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "../index.html";
+            });
+        }
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
+
+    function getTeachersData() {
+        const token = localStorage.getItem("access_token");
+        fetch(`${baseUrl}/getSpecificTeacher/`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        })
+        .then(handleResponse)
+        .then(data => {
+            originalData = { ...data };
+            if(originalData.teacher_type==="hod") {
+                loadComponent("navbar-hod", "../components/hod_navbar.html");
+            }
+            else {
+                loadComponent("navbar-faculty", "../components/faculty_navbar.html");
+            }
+            loadComponent("footer", "../components/footer.html");
+            setTimeout(highlightActiveLink, 100);
+        })
+        .catch(showError);
+    }
+    
+    getTeachersData();
 });
 
 const baseUrl = BE_URL;
 const searchBar = document.querySelector(".searchBar");
 let requests = {};
 let approved = {};
-
-// Event Listeners
-logoutBtn.addEventListener("click", () => {
-    localStorage.clear();
-    window.location.href = "../index.html";
-});
 
 const searchSubject = document.getElementById("pendingSubjectSearch");
 searchSubject.addEventListener("input", function () {
@@ -21,8 +83,23 @@ searchSubject.addEventListener("input", function () {
 // Tab Functions
 function showTab(tabId) {
     toggleActiveClass(tabId);
-    tabId === "pending" ? getPendingRequests() : getApprovedSubjects();
+    if (tabId === "pending") {
+        getPendingRequests();
+    } else {
+        getApprovedSubjects();
+        checkScrollbar();
+    }
 }
+
+function checkScrollbar() {
+    const footer = document.querySelector("footer");
+    if (document.body.scrollHeight <= window.innerHeight) {
+        footer.classList.add("fixed");
+    } else {
+        footer.classList.remove("fixed");
+    }
+}
+
 
 function toggleActiveClass(tabId) {
     document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
@@ -285,7 +362,6 @@ function getApprovedSubjects() {
         .then(data => {
             renderApprovedSubjects(data);
             approved = { ...data };
-            console.log(approved);
         })
         .catch(showError);
 }
@@ -412,7 +488,6 @@ function filterTable() {
     });
 }
 
-// Utility Functions
 function handleResponse(response) {
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
     return response.json();

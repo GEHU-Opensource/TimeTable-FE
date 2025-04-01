@@ -1,0 +1,158 @@
+<style>
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    header img {
+        height: 70px;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        gap: 35px;
+        padding: 0;
+        margin: 0;
+    }
+
+    nav ul li {
+        list-style: none;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        position: relative;
+        padding-bottom: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li a.active::after {
+        content: "";
+        display: block;
+        width: 70%;
+        height: 2.5px;
+        background-color: #007bff;
+        border-radius: 3px;
+        margin-top: 0.3rem;
+        animation: underlineGrow 0.3s ease-out;
+    }
+
+    @keyframes underlineGrow {
+        from { width: 0; }
+        to { width: 70%; }
+    }
+
+    nav ul li a:hover {
+        color: #666;
+    }
+
+    .logout-btn {
+        background-color: #d62828;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .logout-btn:hover {
+        background-color: #9a031e;
+    }
+</style>
+
+<script>
+    async function validateSession() {
+        const accessToken = localStorage.getItem("access_token");
+        const refreshToken = localStorage.getItem("refresh_token");
+        const expirationTime = localStorage.getItem("sessionExpiresAt");
+
+        if (!accessToken || !refreshToken || !expirationTime) {
+            alert("You are not authorized! Redirecting to login.");
+            removeSessionData();
+            window.location.href = "../index.html";
+            return false;
+        }
+
+        const currentTime = Date.now();
+
+        // If token expired, refresh it
+        if (currentTime >= expirationTime) {
+            const refreshed = await refreshAccessToken(refreshToken);
+            return refreshed;
+        }
+
+        startTimer(expirationTime);
+        return true;
+    }
+
+    async function refreshAccessToken(refreshToken) {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh: refreshToken }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.access) {
+                const newExpirationTime = Date.now() + 2 * 60 * 60 * 1000; // 2 hours
+                localStorage.setItem("access_token", data.access);
+                localStorage.setItem("sessionExpiresAt", newExpirationTime);
+                alert("Session refreshed!");
+
+                return validateSession();
+            } else {
+                throw new Error(data.detail || "Session refresh failed");
+            }
+        } catch (error) {
+            console.error("Error refreshing access token:", error);
+            alert("Session expired! Redirecting to login.");
+            removeSessionData();
+            window.location.href = "../index.html";
+            return false;
+        }
+    }
+
+    let sessionTimer;
+    function startTimer(expirationTime) {
+        if (sessionTimer) clearInterval(sessionTimer); // Clear previous timer
+        sessionTimer = setInterval(() => {
+            const currentTime = Date.now();
+            if (currentTime >= expirationTime) {
+                alert("Session Expired!");
+                clearInterval(sessionTimer);
+                removeSessionData();
+                window.location.href = "../index.html";
+            }
+        }, 1000);
+    }
+
+    function removeSessionData() {
+        localStorage.clear();
+    }
+
+    validateSession();
+</script>
+
+<header>
+    <img src="../assets/images/logo.png" alt="logo" />
+    <nav>
+        <ul>
+            <li><a href="/faculty/timetable.html">TimeTable</a></li>
+            <li><a href="/faculty/profile.html">Profile</a></li>
+            <li><a href="/faculty/settings.html">Settings</a></li>
+        </ul>
+    </nav>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+</header>

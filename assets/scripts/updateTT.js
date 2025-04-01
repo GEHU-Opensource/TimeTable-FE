@@ -1,25 +1,66 @@
 document.addEventListener("DOMContentLoaded", () => {
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function attachNavbarEventListeners() {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "../index.html";
+            });
+        }
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
+    loadComponent("navbar-admin", "../components/admin_navbar.html");
+    loadComponent("footer", "../components/footer.html");
+    setTimeout(highlightActiveLink, 100);
+
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");
     const branchDropdown = document.getElementById("branch");
     const yearDropdown = document.getElementById("year");
     const semesterDropdown = document.getElementById("semester");
     const updateButton = document.getElementById("updateTT");
-    const fileInput = document.getElementById('tt');
-    const fileChosen = document.getElementById('file-chosen');
-    const logoutBtn = document.querySelector(".logout-btn");
-      logoutBtn.addEventListener("click", () => {
-          localStorage.clear();
-          window.location.href = "../index.html";
-      });
+    const fileInput = document.getElementById("tt");
+    const fileChosen = document.getElementById("file-chosen");
 
-    fileInput.addEventListener('change', () => {
-        fileChosen.textContent = fileInput.files[0]?.name || "No file chosen";
+    // Display selected file names
+    fileInput.addEventListener("change", () => {
+        const files = Array.from(fileInput.files).map(file => file.name).join(", ");
+        fileChosen.textContent = files || "No file chosen";
     });
 
-    if (typeof departments !== 'undefined') {
+    // Populate department dropdown
+    if (typeof departments !== "undefined") {
         departments.forEach(department => {
-            const option = document.createElement('option');
+            const option = document.createElement("option");
             option.value = department.name;
             option.textContent = department.name;
             departmentDropdown.appendChild(option);
@@ -29,10 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function clearDropdown(dropdown) {
-        dropdown.innerHTML = '';
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Select an option';
+        dropdown.innerHTML = "";
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Select an option";
         dropdown.appendChild(defaultOption);
     }
 
@@ -48,7 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
     departmentDropdown.addEventListener("change", function () {
         const selectedDepartment = departmentDropdown.value;
         clearDropdown(courseDropdown);
-        populateDropdown(courseDropdown, departments.find(dep => dep.name === selectedDepartment)?.courses || [], "name", "name");
+        populateDropdown(
+            courseDropdown,
+            departments.find(dep => dep.name === selectedDepartment)?.courses || [],
+            "name",
+            "name"
+        );
     });
 
     courseDropdown.addEventListener("change", function () {
@@ -76,33 +122,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     updateButton.addEventListener("click", function () {
-        const data = {
-            department: departmentDropdown.value,
-            course: courseDropdown.value,
-            branch: branchDropdown.value,
-            year: yearDropdown.value,
-            semester: semesterDropdown.value,
-            ttFile: fileInput.files[0],
-        };
-        if(!data.department || !data.course || !data.year || !data.semester) {
-            alert("Fill the Details!");
-            return ;
-        }
-        
-        if(!fileInput.files.length) {
-            alert("Please select a file before submitting.");
+        if (!departmentDropdown.value || !courseDropdown.value || !yearDropdown.value || !semesterDropdown.value) {
+            alert("Fill in all the details!");
             return;
         }
 
-        console.log("Form Data:", data);
+        if (!fileInput.files.length) {
+            alert("Please select at least one file before submitting.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("department", departmentDropdown.value);
+        formData.append("course", courseDropdown.value);
+        formData.append("branch", branchDropdown.value);
+        formData.append("year", yearDropdown.value);
+        formData.append("semester", semesterDropdown.value);
+
+        // Append multiple files
+        Array.from(fileInput.files).forEach(file => {
+            formData.append("csv_files[]", file);
+            console.log(file);
+        });
+
+        console.log("Form Data:", formData);
         alert("Updated successfully!");
+
         /*
         fetch("api", {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
+            body: formData, // Using FormData to send files
         })
         .then(response => {
             if (!response.ok) {
@@ -117,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => {
             console.error("Error:", error);
             alert("Failed to update timetable. Please try again.");
-        });*/
+        });
+        */
     });
 });

@@ -1,34 +1,51 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const logoutBtn = document.getElementById("logoutBtn");
     const departmentDropdown = document.getElementById("department");
     const profileForm = document.getElementById("profileForm");
-    const searchInput = document.getElementById("searchSubjects");
-    const dropdownContent = document.querySelector(".dropdown-content");
-    const selectedSubjectsContainer = document.querySelector(".selected-subjects");
     const subjectList = document.getElementById("subjectList");
     const editButton = document.getElementById("editBtn");
     const submitBtn = document.getElementById("submitBtn");
     const profileHead = document.getElementById("profileHeading");
     const baseUrl = BE_URL;
     let originalData = {};
-
-    logoutBtn.addEventListener("click", () => {
-        localStorage.clear();
-        window.location.href = "../index.html";
-    });
-
-    searchInput.addEventListener("focus", function () {
-        dropdownContent.style.display = "block";
-    });
-
-    document.addEventListener("click", function (event) {
-        if (
-            !searchInput.contains(event.target) &&
-            !dropdownContent.contains(event.target)
-        ) {
-            dropdownContent.style.display = "none";
+    function loadComponent(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                attachNavbarEventListeners();
+            });
+    }
+    
+    function attachNavbarEventListeners() {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "../index.html";
+            });
         }
-    });
+    }
+    
+    function highlightActiveLink() {
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const footer = document.querySelector("footer");
+        function checkScrollbar() {
+            if (document.body.scrollHeight <= window.innerHeight) {
+                footer.classList.add("fixed");
+            } else {
+                footer.classList.remove("fixed");
+            }
+        }
+        checkScrollbar();
+        window.addEventListener("resize", checkScrollbar);
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll("nav ul li a");
+        navLinks.forEach(link => {
+            if (currentPath.endsWith(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+    }
 
     function getTeachersData() {
         const token = localStorage.getItem("access_token");
@@ -42,6 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(handleResponse)
         .then(data => {
             originalData = { ...data };
+            if(originalData.teacher_type==="hod") {
+                loadComponent("navbar-hod", "../components/hod_navbar.html");
+            }
+            else {
+                loadComponent("navbar-faculty", "../components/faculty_navbar.html");
+            }
+            loadComponent("footer", "../components/footer.html");
+            setTimeout(highlightActiveLink, 100);
+            
             if(originalData.assigned_subjects.length===0) {
                 document.querySelector(".inRequest").style.display = "block";
             }
@@ -50,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             populateProfileForm(data);
             loadDepartments(data.department);
-            loadSubjects(data.assigned_subjects || []);
+            updateSelectedSubjects();
             const teacherCode = data.teacher_code;
             profileHead.textContent = `Profile ( ${teacherCode} )`;
         })
@@ -58,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function populateProfileForm(data) {
-
         profileForm.elements["name"].value = data.name || "";
         profileForm.elements["phone"].value = data.phone || "";
         profileForm.elements["email"].value = data.email || "";
@@ -85,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (confirm("You have unsaved changes. Discard them?")) {
                 populateProfileForm(originalData);
                 loadDepartments(originalData.department);
-                loadSubjects(originalData.assigned_subjects || []);
                 toggleEditMode(false);
             } else {
                 toggleEditMode(false);
@@ -97,11 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     profileForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const selectedSubjects = getSelectedSubjects();
-        if (selectedSubjects.length === 0) {
-            alert("Please select at least one preferred subject.");
-            return ;
-        }
+        const assignedSubjects = originalData.assigned_subjects;
         const updatedData = {
             id: originalData.id,
             teacher_code: originalData.teacher_code,
@@ -112,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             department: profileForm.elements["department"].value,
             designation: profileForm.elements["designation"].value,
             working_days: profileForm.elements["working_days"].value,
-            assigned_subjects: selectedSubjects,
+            assigned_subjects: assignedSubjects,
         };
         if(confirm("Are you sure to Submit these details?"))
             submitData(updatedData);
@@ -150,61 +170,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function loadSubjects(preferredSubjects) {
-        dropdownContent.innerHTML = ""; // Clear previous content
-    
-        fetch(`${baseUrl}/getAllSubjects/`, { method: "GET" })
-            .then(handleResponse)
-            .then((subjects) => {
-                if (!Array.isArray(subjects) || subjects.length === 0) {
-                    dropdownContent.innerHTML = "<label>No subjects available</label>";
-                    return;
-                }
-    
-                subjects.forEach((subject) => {
-                    const label = document.createElement("label");
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.value = subject.subject_name;
-                    checkbox.checked = preferredSubjects.includes(subject.subject_name);
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${subject.subject_name}`));
-                    dropdownContent.appendChild(label);
-    
-                    checkbox.addEventListener("change", updateSelectedSubjects);
-                });
-    
-                updateSelectedSubjects(); // Ensure selected subjects are updated
-            })
-            .catch(showError);
-    }
-    
-
     function updateSelectedSubjects() {
-        const selectedSubjects = getSelectedSubjects();
+        const assignedSubjects = originalData.assigned_subjects;
         subjectList.innerHTML = "";
-        if (selectedSubjects.length > 0) {
-            selectedSubjects.forEach((subject) => {
-                const subjectElement = document.createElement("span");
-                subjectElement.textContent = subject;
-                subjectList.appendChild(subjectElement);
-            });
-            selectedSubjectsContainer.style.display = "block";
-        }
-        else {
-            selectedSubjectsContainer.style.display = "none";
-        }
-    }
     
-    function getSelectedSubjects() {
-        const selectedSubjects = [];
-        const checkboxes = dropdownContent.querySelectorAll("input[type='checkbox']");
-        checkboxes.forEach((checkbox) => {
-            if (checkbox.checked) {
-                selectedSubjects.push(checkbox.value);
-            }
+        assignedSubjects.forEach((subjectObj) => {
+            // Create container for each subject
+            const subject_code = Object.keys(subjectObj)[0];
+            const subject_name = subjectObj[subject_code];
+
+            const subjectContainer = document.createElement("div");
+            subjectContainer.classList.add("subject-card");
+    
+            // Create div for subject code
+            const codeDiv = document.createElement("div");
+            codeDiv.classList.add("subject-code");
+            codeDiv.textContent = subject_code;
+    
+            // Create div for subject name
+            const nameDiv = document.createElement("div");
+            nameDiv.classList.add("subject-name");
+            nameDiv.textContent = subject_name;
+    
+            // Append both divs to container
+            subjectContainer.appendChild(codeDiv);
+            subjectContainer.appendChild(nameDiv);
+            
+            // Append container to subject list
+            subjectList.appendChild(subjectContainer);
         });
-        return selectedSubjects;
     }
 
     function handleResponse(response) {
@@ -226,38 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             alert(errorMessage);
         }
-    }    
-    
-
-    function setupSearchInput() {
-        searchInput.addEventListener("input", function () {
-            const searchValue = this.value.toLowerCase();
-            const labels = dropdownContent.querySelectorAll("label");
-            let hasVisibleOption = false;
-    
-            labels.forEach((label) => {
-                const text = label.textContent.toLowerCase();
-                label.style.display = text.includes(searchValue) ? "flex" : "none";
-                if (text.includes(searchValue)) hasVisibleOption = true;
-            });
-    
-            dropdownContent.style.display = hasVisibleOption ? "block" : "none";
-        });
-    
-        searchInput.addEventListener("focus", function () {
-            dropdownContent.style.display = "block";
-        });
-    
-        document.addEventListener("click", function (event) {
-            if (
-                !searchInput.contains(event.target) &&
-                !dropdownContent.contains(event.target)
-            ) {
-                dropdownContent.style.display = "none";
-            }
-        });
     }
 
     getTeachersData();
-    setupSearchInput();
 });
