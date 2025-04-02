@@ -95,14 +95,3 @@ input[type="checkbox"] {
     margin-top: 10px;
     display: none;
 }
-
-@media (max-width: 768px) {
-    .container {
-        width: 90%;
-        padding: 20px;
-    }
-
-    .logo {
-        width: 60px;
-    }
-}

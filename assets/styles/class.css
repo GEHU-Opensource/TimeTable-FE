@@ -1,54 +1,8 @@
-/* Common Styling */
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
     margin: 0;
     padding: 0;
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-header img {
-    height: 70px;
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-nav ul li a:hover {
-    text-decoration: none;
-    color: #666;
-    font-weight: bold;
-}
-
-.logout-btn {
-    background-color: #d62828;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.logout-btn:hover {
-    background-color: #9a031e;
 }
 
 main {
@@ -90,7 +44,6 @@ h2 {
     box-shadow: 0 0 5px rgba(40,167,69,0.8);
 }
 
-/* Corrected CSS */
 #noRoomsMessage {
     text-align: center;
     font-size: 18px;
@@ -103,7 +56,6 @@ h2 {
     border-radius: 5px;
 }
 
-/* Add this to ensure proper spacing */
 #existingClassData {
     position: relative;
 }

@@ -225,7 +225,6 @@ button[type="submit"]:hover {
     gap: 20px;
 }
 
-/* Table Styling */
 .approved-table {
     width: 100%;
     border-collapse: collapse;
@@ -242,24 +241,22 @@ button[type="submit"]:hover {
     vertical-align: middle;
 }
 
-/* Column Widths */
 .approved-table th:nth-child(1),
 .approved-table td:nth-child(1) {
-    width: 30%; /* Subject Name */
+    width: 30%;
 }
 
 .approved-table th:nth-child(2),
 .approved-table td:nth-child(2) {
-    width: 20%; /* Subject Code */
+    width: 20%;
 }
 
 .approved-table th:nth-child(3),
 .approved-table td:nth-child(3) {
-    width: 30%; /* Faculty */
-    padding-right: 30px; /* Extra padding for last column */
+    width: 30%;
+    padding-right: 30px;
 }
 
-/* Header Styling */
 .approved-table th {
     background-color: #f8f9fa;
     color: #333;
@@ -269,25 +266,21 @@ button[type="submit"]:hover {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Cell Styling */
 .approved-table td {
     background-color: #fff;
     color: #555;
 }
 
-/* Zebra Striping */
 .approved-table tr:nth-child(even) td {
     background-color: #f9f9f9;
 }
 
-/* Hover Effect */
 .approved-table tr:hover td {
     background-color: #f1f5ff;
 }
 
-/* Search Inputs in Headers */
 .approved-table th .subjectTable {
-    width: calc(100% - 24px); /* Full width minus padding */
+    width: calc(100% - 24px);
     padding: 8px 12px;
     margin-top: 5px;
     border: 1px solid #ddd;
@@ -303,7 +296,6 @@ button[type="submit"]:hover {
     outline: none;
 }
 
-/* Faculty List Styling */
 .faculty-list {
     margin: 0;
     padding-left: 20px;
