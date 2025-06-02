@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
-            .then(response => response.text())
-            .then(data => {
+            .then((response) => response.text())
+            .then((data) => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -17,9 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     }
-    
+
     function highlightActiveLink() {
-        document.getElementById("current-year").textContent = new Date().getFullYear();
+        document.getElementById("current-year").textContent =
+            new Date().getFullYear();
         const footer = document.querySelector("footer");
         function checkScrollbar() {
             if (document.body.scrollHeight <= window.innerHeight) {
@@ -32,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("resize", checkScrollbar);
         const currentPath = window.location.pathname;
         const navLinks = document.querySelectorAll("nav ul li a");
-        navLinks.forEach(link => {
+        navLinks.forEach((link) => {
             if (currentPath.endsWith(link.getAttribute("href"))) {
                 link.classList.add("active");
             }
@@ -40,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     loadComponent("navbar-admin", "../components/admin_navbar.html");
     loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
+    setTimeout(highlightActiveLink, 1000);
 
     const uploadForm = document.getElementById("uploadForm");
     const csvInput = document.getElementById("csvFiles");
@@ -64,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("csv_files", file);
         }
 
+        showLoader();
         try {
             showMessage("Processing... Please wait.", "info");
 
@@ -90,6 +96,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (error) {
             showMessage("Network error. Please try again.", "error");
+        } finally {
+            hdieLoader();
         }
     });
 

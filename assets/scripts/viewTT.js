@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -17,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -40,13 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadComponent("navbar-admin", "../components/admin_navbar.html");
     loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
+    setTimeout(highlightActiveLink, 1000);
 
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");
     const branchDropdown = document.getElementById("branch");
-    const yearDropdown = document.getElementById("year");
-    const semesterDropdown = document.getElementById("semester");
+    // const yearDropdown = document.getElementById("year");
+    // const semesterDropdown = document.getElementById("semester");
     const viewButton = document.getElementById("viewTT");
     const downloadButton = document.getElementById("download-btn");
     const timetable = document.getElementById("show");
@@ -116,41 +120,41 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedBranch = selectedCourse?.branches.find(
             (branch) => branch.name === branchDropdown.value
         );
-        clearDropdown(yearDropdown);
-        populateDropdown(yearDropdown, selectedBranch?.years || [], "year", "year");
+        // clearDropdown(yearDropdown);
+        // populateDropdown(yearDropdown, selectedBranch?.years || [], "year", "year");
     });
 
-    yearDropdown.addEventListener("change", function () {
-        const selectedDepartment = departments.find(
-            (department) => department.name === departmentDropdown.value
-        );
-        const selectedCourse = selectedDepartment?.courses.find(
-            (course) => course.name === courseDropdown.value
-        );
-        const selectedBranch = selectedCourse?.branches.find(
-            (branch) => branch.name === branchDropdown.value
-        );
-        const selectedYear = selectedBranch?.years.find(
-            (year) => year.year === yearDropdown.value
-        );
-        clearDropdown(semesterDropdown);
-        populateDropdown(
-            semesterDropdown,
-            selectedYear?.semesters || [],
-            "sem",
-            "sem"
-        );
-    });
+    // yearDropdown.addEventListener("change", function () {
+    //     const selectedDepartment = departments.find(
+    //         (department) => department.name === departmentDropdown.value
+    //     );
+    //     const selectedCourse = selectedDepartment?.courses.find(
+    //         (course) => course.name === courseDropdown.value
+    //     );
+    //     const selectedBranch = selectedCourse?.branches.find(
+    //         (branch) => branch.name === branchDropdown.value
+    //     );
+    //     const selectedYear = selectedBranch?.years.find(
+    //         (year) => year.year === yearDropdown.value
+    //     );
+    //     clearDropdown(semesterDropdown);
+    //     populateDropdown(
+    //         semesterDropdown,
+    //         selectedYear?.semesters || [],
+    //         "sem",
+    //         "sem"
+    //     );
+    // });
 
     viewButton.addEventListener("click", function () {
         const data = {
             department: departmentDropdown.value,
             course: courseDropdown.value,
             branch: branchDropdown.value,
-            year: yearDropdown.value,
-            semester: semesterDropdown.value,
+            // year: yearDropdown.value,
+            // semester: semesterDropdown.value,
         };
-        if (!data.department || !data.course || !data.year || !data.semester) {
+        if (!data.department || !data.course) {
             alert("Fill the Details!");
             return;
         }
@@ -162,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const file = generateTT; // API:departmen/course/branch/year/semester
 
         if (typeof file !== "undefined") {
+            showLoader();
             fetch(file, {
                 method: "GET",
                 headers: {
@@ -191,6 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .catch((error) => {
                     alert("Failed to load the Excel file: " + error.message);
+                })
+                .finally(() => {
+                    hideLoader();
                 });
         } else {
             alert("Excel file path is missing in data.js.");
@@ -200,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadButton.addEventListener("click", () => {
         const apiEndpoint = generateTT; // Replace with your API endpoint
 
+        showLoader();
         fetch(apiEndpoint, {
             method: "GET",
             headers: {
@@ -230,6 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch((error) => {
                 alert("Failed to download the file: " + error.message);
+            })
+            .finally(() => {
+                hideLoader();
             });
     });
 

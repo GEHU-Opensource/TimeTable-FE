@@ -1224,3 +1224,11 @@ const departments = [
 
 const generateTT = "../testing.xlsx";
 const BE_URL = "http://127.0.0.1:8000";
+
+const showLoader = () => {
+    document.getElementById('loader').style.display = 'flex';
+};
+
+const hideLoader = () => {
+    document.getElementById('loader').style.display = 'none';
+};

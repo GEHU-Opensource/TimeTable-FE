@@ -1,16 +1,21 @@
-document.addEventListener("DOMContentLoaded", ()=> {
+document.addEventListener("DOMContentLoaded", () => {
     const baseUrl = BE_URL;
     let originalData = {};
+    const token = localStorage.getItem("access_token");
 
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -20,7 +25,7 @@ document.addEventListener("DOMContentLoaded", ()=> {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -44,7 +49,7 @@ document.addEventListener("DOMContentLoaded", ()=> {
 
     document.getElementById("show-password").addEventListener("click", function () {
         var passwordFields = document.querySelectorAll(".password");
-        passwordFields.forEach(function(field) {
+        passwordFields.forEach(function (field) {
             if (field.type === "password") {
                 field.type = "text";
             }
@@ -60,11 +65,12 @@ document.addEventListener("DOMContentLoaded", ()=> {
         const newPasswordInput = document.getElementById("newPass");
         const confirmPasswordInput = document.getElementById("confirmPass");
         const data = {
-            old_password : oldPasswordInput.value.trim(),
-            new_password : newPasswordInput.value.trim(),
-            confirm_password : confirmPasswordInput.value.trim(),
+            old_password: oldPasswordInput.value.trim(),
+            new_password: newPasswordInput.value.trim(),
+            confirm_password: confirmPasswordInput.value.trim(),
         }
-        const token = localStorage.getItem("access_token");
+        
+        showLoader();
         fetch(`${baseUrl}/updatePassword/`, {
             method: "PUT",
             headers: {
@@ -78,7 +84,10 @@ document.addEventListener("DOMContentLoaded", ()=> {
                 alert(response.message);
                 document.location.reload();
             })
-            .catch(showError);
+            .catch(showError)
+            .finally(() => {
+                hideLoader();
+            });
     });
 
     function handleResponse(response) {
@@ -88,12 +97,12 @@ document.addEventListener("DOMContentLoaded", ()=> {
             }
             return data;
         });
-    }    
+    }
 
     function showError(error) {
         console.error("Error: ", error);
         const errorMessage = error.message || "An error occurred.";
-    
+
         if (errorMessage.includes("401")) {
             alert("Session expired. Redirecting to login...");
             window.location.href = "../index.html";
@@ -101,9 +110,9 @@ document.addEventListener("DOMContentLoaded", ()=> {
             alert(errorMessage);
         }
     }
-    
+
     function getTeachersData() {
-        const token = localStorage.getItem("access_token");
+        showLoader();
         fetch(`${baseUrl}/getSpecificTeacher/`, {
             method: "GET",
             headers: {
@@ -111,19 +120,22 @@ document.addEventListener("DOMContentLoaded", ()=> {
                 "Content-Type": "application/json",
             },
         })
-        .then(handleResponse)
-        .then(data => {
-            originalData = { ...data };
-            if(originalData.teacher_type==="hod") {
-                loadComponent("navbar-hod", "../components/hod_navbar.html");
-            }
-            else {
-                loadComponent("navbar-faculty", "../components/faculty_navbar.html");
-            }
-            loadComponent("footer", "../components/footer.html");
-            setTimeout(highlightActiveLink, 100);
-        })
-        .catch(showError);
+            .then(handleResponse)
+            .then(data => {
+                originalData = { ...data };
+                if (originalData.teacher_type === "hod") {
+                    loadComponent("navbar-hod", "../components/hod_navbar.html");
+                }
+                else {
+                    loadComponent("navbar-faculty", "../components/faculty_navbar.html");
+                }
+                loadComponent("footer", "../components/footer.html");
+                setTimeout(highlightActiveLink, 1000);
+            })
+            .catch(showError)
+            .finally(() => {
+                hideLoader();
+            });
     }
 
     getTeachersData();

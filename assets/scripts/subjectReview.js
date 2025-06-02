@@ -1,17 +1,22 @@
 document.addEventListener("DOMContentLoaded", function () {
     showTab("pending");
-    
+
     let originalData = {};
+    const token = localStorage.getItem("access_token");
 
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -21,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -44,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getTeachersData() {
-        const token = localStorage.getItem("access_token");
+        showLoader();
         fetch(`${baseUrl}/getSpecificTeacher/`, {
             method: "GET",
             headers: {
@@ -52,21 +57,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json",
             },
         })
-        .then(handleResponse)
-        .then(data => {
-            originalData = { ...data };
-            if(originalData.teacher_type==="hod") {
-                loadComponent("navbar-hod", "../components/hod_navbar.html");
-            }
-            else {
-                loadComponent("navbar-faculty", "../components/faculty_navbar.html");
-            }
-            loadComponent("footer", "../components/footer.html");
-            setTimeout(highlightActiveLink, 100);
-        })
-        .catch(showError);
+            .then(handleResponse)
+            .then(data => {
+                originalData = { ...data };
+                if (originalData.teacher_type === "hod") {
+                    loadComponent("navbar-hod", "../components/hod_navbar.html");
+                }
+                else {
+                    loadComponent("navbar-faculty", "../components/faculty_navbar.html");
+                }
+                loadComponent("footer", "../components/footer.html");
+                setTimeout(highlightActiveLink, 1000);
+            })
+            .catch(showError)
+            .finally(() => {
+                hideLoader();
+            });
     }
-    
+
     getTeachersData();
 });
 
@@ -74,6 +82,7 @@ const baseUrl = BE_URL;
 const searchBar = document.querySelector(".searchBar");
 let requests = {};
 let approved = {};
+const token = localStorage.getItem("access_token");
 
 const searchSubject = document.getElementById("pendingSubjectSearch");
 searchSubject.addEventListener("input", function () {
@@ -110,14 +119,14 @@ function toggleActiveClass(tabId) {
 
 // Pending Requests Functions
 function getPendingRequests() {
-    const token = localStorage.getItem("access_token");
+    showLoader();
     fetch(`${baseUrl}/getPendingRequests/`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        })
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+    })
         .then(handleResponse)
         .then(data => {
             if (Object.keys(data.pending_requests).length === 0) {
@@ -125,10 +134,13 @@ function getPendingRequests() {
                 return;
             }
             searchBar.style.display = "flex";
-            requests = {...data};
+            requests = { ...data };
             loadPendingSubjects(requests);
         })
-        .catch(showError);
+        .catch(showError)
+        .finally(() => {
+            hideLoader();
+        });
 }
 
 function loadPendingSubjects(requests) {
@@ -141,7 +153,7 @@ function loadPendingSubjects(requests) {
 }
 
 function searchPendingSubjects(searchValue) {
-    const filteredSubjects = requests.subjects.filter(({ subject_name, subject_code }) => 
+    const filteredSubjects = requests.subjects.filter(({ subject_name, subject_code }) =>
         subject_name.toLowerCase().includes(searchValue) || subject_code.toLowerCase().includes(searchValue)
     );
 
@@ -158,6 +170,7 @@ function searchPendingSubjects(searchValue) {
         });
         approveBtn.style.display = "inline-block";
     }
+    checkScrollbar();
 }
 
 // Subject Card Functions
@@ -171,7 +184,7 @@ function createSubjectCard(subject_name, subject_code, requests) {
     subjectDiv.classList.add("subject-container");
 
     const teachersLabel = requests.pending_requests[subject_code] || [];
-    const assignedTeachers = teachersLabel.map(obj => { 
+    const assignedTeachers = teachersLabel.map(obj => {
         const teacherCode = Object.keys(obj)[0];
         const teacherName = obj[teacherCode];
         return `${teacherName} (${teacherCode})`;
@@ -202,7 +215,7 @@ function setupTeacherDropdown(assignedTeachers, requests, dropdown, selectedTeac
 }
 
 function populateDropdown(assignedTeachers, requests, dropdown) {
-    const allTeachers = requests.teachers.map(t => t.teacher_name+" ("+t.teacher_code+")");
+    const allTeachers = requests.teachers.map(t => t.teacher_name + " (" + t.teacher_code + ")");
     assignedTeachers.forEach(teacher => dropdown.appendChild(createTeacherCheckbox(teacher, true)));
     allTeachers.filter(t => !assignedTeachers.includes(t)).forEach(teacher_code => dropdown.appendChild(createTeacherCheckbox(teacher_code, false)));
 }
@@ -305,14 +318,14 @@ function getSelectedTeachersMap(requests) {
             let teacherCode = null;
             if (teacherNameAndCode.includes("(")) {
                 teacherCode = teacherNameAndCode.substring(
-                    teacherNameAndCode.indexOf('(') + 1, 
+                    teacherNameAndCode.indexOf('(') + 1,
                     teacherNameAndCode.indexOf(')')
                 );
             } else {
                 teacherCode = teacherNameAndCode;
             }
             const teacherData = requests.teachers.find(t => t.teacher_code === teacherCode);
-            
+
             if (teacherData) selectedTeachers.push(teacherData.teacher_code)
             else selectedTeachers.push(teacherCode);
         });
@@ -328,7 +341,7 @@ function isValidTeachersSelection(selectedTeachersMap) {
 }
 
 function submitApproval(selectedTeachersMap) {
-    const token = localStorage.getItem("access_token");
+    showLoader();
     fetch(`${baseUrl}/approveSubjectRequests/`, {
         method: "POST",
         headers: {
@@ -337,33 +350,39 @@ function submitApproval(selectedTeachersMap) {
         },
         body: JSON.stringify(selectedTeachersMap),
     })
-    .then(handleResponse)
-    .then(() => {
-        alert("Subjects approved successfully!");
-        document.location.reload();
-    })
-    .catch(error => {
-        console.error("Error approving subjects:", error);
-        alert("Failed to approve subjects.");
-    });
+        .then(handleResponse)
+        .then(() => {
+            alert("Subjects approved successfully!");
+            document.location.reload();
+        })
+        .catch(error => {
+            console.error("Error approving subjects:", error);
+            alert("Failed to approve subjects.");
+        })
+        .finally(() => {
+            hideLoader();
+        });
 }
 
 // Approved Subjects Functions
 function getApprovedSubjects() {
-    const token = localStorage.getItem("access_token");
+    showLoader();
     fetch(`${baseUrl}/getApprovedSubjects/`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        })
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+    })
         .then(handleResponse)
         .then(data => {
             renderApprovedSubjects(data);
             approved = { ...data };
         })
-        .catch(showError);
+        .catch(showError)
+        .finally(() => {
+            hideLoader();
+        });
 }
 
 function renderApprovedSubjects(approvedData) {
@@ -430,11 +449,11 @@ function createApprovedSubjectCard(subject_name, subject_code, teachers, lastSub
             <td></td>
             <td></td>
             <td>
-                ${teachers.length > 0 
-                    ? `<ul class="faculty-list">
+                ${teachers.length > 0
+                ? `<ul class="faculty-list">
                         ${teachers.map(teacher => `<li class="faculty-name">${teacher}</li>`).join('')}
                       </ul>`
-                    : "<span class='faculty-name'>No faculty assigned</span>"}
+                : "<span class='faculty-name'>No faculty assigned</span>"}
             </td>
         `;
     } else {
@@ -442,11 +461,11 @@ function createApprovedSubjectCard(subject_name, subject_code, teachers, lastSub
             <td>${subject_name}</td>
             <td>${subject_code}</td>
             <td>
-                ${teachers.length > 0 
-                    ? `<ul class="faculty-list">
+                ${teachers.length > 0
+                ? `<ul class="faculty-list">
                         ${teachers.map(teacher => `<li class="faculty-name">${teacher}</li>`).join('')}
                       </ul>`
-                    : "<span class='faculty-name'>No faculty assigned</span>"}
+                : "<span class='faculty-name'>No faculty assigned</span>"}
             </td>
         `;
     }

@@ -7,11 +7,95 @@
     <title>Admin | Generate TimeTable</title>
     <link rel="shortcut icon" href="../assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/styles/generateTT.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="../assets/styles/root.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        async function validateSession() {
+            const accessToken = localStorage.getItem("access_token");
+            const refreshToken = localStorage.getItem("refresh_token");
+            const expirationTime = localStorage.getItem("sessionExpiresAt");
+
+            if (!accessToken || !refreshToken || !expirationTime) {
+                alert("You are not authorized! Redirecting to login.");
+                removeSessionData();
+                window.location.href = "../index.html";
+                return false;
+            }
+
+            const currentTime = Date.now();
+
+            // If token expired, refresh it
+            if (currentTime >= expirationTime) {
+                const refreshed = await refreshAccessToken(refreshToken);
+                return refreshed;
+            }
+
+            startTimer(expirationTime);
+            return true;
+        }
+
+        async function refreshAccessToken(refreshToken) {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh: refreshToken }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.access) {
+                    const newExpirationTime = Date.now() + 2 * 60 * 60 * 1000; // 2 hours
+                    localStorage.setItem("access_token", data.access);
+                    localStorage.setItem("sessionExpiresAt", newExpirationTime);
+                    alert("Session refreshed!");
+
+                    return validateSession();
+                } else {
+                    throw new Error(data.detail || "Session refresh failed");
+                }
+            } catch (error) {
+                console.error("Error refreshing access token:", error);
+                alert("Session expired! Redirecting to login.");
+                removeSessionData();
+                window.location.href = "../index.html";
+                return false;
+            }
+        }
+
+        let sessionTimer;
+        function startTimer(expirationTime) {
+            if (sessionTimer) clearInterval(sessionTimer); // Clear previous timer
+            sessionTimer = setInterval(() => {
+                const currentTime = Date.now();
+                if (currentTime >= expirationTime) {
+                    alert("Session Expired!");
+                    clearInterval(sessionTimer);
+                    removeSessionData();
+                    window.location.href = "../index.html";
+                }
+            }, 1000);
+        }
+
+        function removeSessionData() {
+            localStorage.clear();
+        }
+        validateSession();
+    </script>
+
 </head>
 
 <body>
+    <div id="loader" style="display: none;">
+        <div class="loader-overlay">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
     <div id="navbar-admin"></div>
 
     <main>
@@ -52,6 +136,7 @@
                         <option value="" selected>Select Semester</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label for="weeklyWorkload">Weekly Workload *</label>
                     <table id="weeklyLoad">
@@ -64,27 +149,33 @@
                         <tbody id="weeklyLoadBody">
                             <tr>
                                 <td>Professor</td>
-                                <td><input type="number" min="0" name="professorWeeklyLoad" id="professorLoad" placeholder="(in hours)"></td>
+                                <td><input type="number" min="0" name="professorWeeklyLoad" id="professorLoad"
+                                        placeholder="(in hours)"></td>
                             </tr>
                             <tr>
                                 <td>Adjunct Faculty</td>
-                                <td><input type="number" min="0" name="adjunctWeeklyLoad" id="adjunctLoad" placeholder="(in hours)"></td>
+                                <td><input type="number" min="0" name="adjunctWeeklyLoad" id="adjunctLoad"
+                                        placeholder="(in hours)"></td>
                             </tr>
                             <tr>
                                 <td>Head of Department</td>
-                                <td><input type="number" min="0" name="hodWeeklyLoad" id="hodLoad" placeholder="(in hours)"></td>
+                                <td><input type="number" min="0" name="hodWeeklyLoad" id="hodLoad"
+                                        placeholder="(in hours)"></td>
                             </tr>
                             <tr>
                                 <td>Assistant Professor</td>
-                                <td><input type="number" min="0" name="assistantProfessorWeeklyLoad" id="assistant_professorLoad" placeholder="(in hours)"></td>
+                                <td><input type="number" min="0" name="assistantProfessorWeeklyLoad"
+                                        id="assistant_professorLoad" placeholder="(in hours)"></td>
                             </tr>
                             <tr>
                                 <td>Lecturer</td>
-                                <td><input type="number" min="0" name="lecturerWeeklyLoad" id="lecturerLoad" placeholder="(in hours)"></td>
+                                <td><input type="number" min="0" name="lecturerWeeklyLoad" id="lecturerLoad"
+                                        placeholder="(in hours)"></td>
                             </tr>
                             <tr>
                                 <td>Lab Assistant</td>
-                                <td><input type="number" min="0" name="labAssistantWeeklyLoad" id="lab_assistantLoad" placeholder="(in hours)"></td>
+                                <td><input type="number" min="0" name="labAssistantWeeklyLoad" id="lab_assistantLoad"
+                                        placeholder="(in hours)"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -92,7 +183,8 @@
 
                 <div class="time-slot-group">
                     <label for="time-slots">Time Slots *</label>
-                    <button type="button" id="add-time-slot"><i class="fa fa-plus-square" aria-hidden="true"></i></button>
+                    <button type="button" id="add-time-slot"><i class="fa fa-plus-square"
+                            aria-hidden="true"></i></button>
                 </div>
                 <table id="time-slot-table">
                     <thead>
@@ -112,14 +204,7 @@
             </form>
         </div>
 
-        <div class="show" id="show">
-            <h1>Generated TimeTable</h1>
-            <label for="sheet-selector">Section:</label>
-            <select id="sheet-selector"></select>
-            <button id="download-btn">Download</button>
-            <br /><br />
-            <div id="output"></div>
-        </div>
+        <div class="show" id="show"></div>
     </main>
 
     <div id="footer"></div>

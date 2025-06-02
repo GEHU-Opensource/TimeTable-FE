@@ -7,15 +7,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileHead = document.getElementById("profileHeading");
     const baseUrl = BE_URL;
     let originalData = {};
+    const token = localStorage.getItem("access_token");
+
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -25,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -48,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getTeachersData() {
-        const token = localStorage.getItem("access_token");
+        showLoader();
         fetch(`${baseUrl}/getSpecificTeacher/`, {
             method: "GET",
             headers: {
@@ -56,31 +62,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Content-Type": "application/json",
             },
         })
-        .then(handleResponse)
-        .then(data => {
-            originalData = { ...data };
-            if(originalData.teacher_type==="hod") {
-                loadComponent("navbar-hod", "../components/hod_navbar.html");
-            }
-            else {
-                loadComponent("navbar-faculty", "../components/faculty_navbar.html");
-            }
-            loadComponent("footer", "../components/footer.html");
-            setTimeout(highlightActiveLink, 100);
-            
-            if(originalData.assigned_subjects.length===0) {
-                document.querySelector(".inRequest").style.display = "block";
-            }
-            else {
-                document.querySelector(".inRequest").style.display = "none";
-            }
-            populateProfileForm(data);
-            loadDepartments(data.department);
-            updateSelectedSubjects();
-            const teacherCode = data.teacher_code;
-            profileHead.textContent = `Profile ( ${teacherCode} )`;
-        })
-        .catch(showError);
+            .then(handleResponse)
+            .then(data => {
+                originalData = { ...data };
+                if (originalData.teacher_type === "hod") {
+                    loadComponent("navbar-hod", "../components/hod_navbar.html");
+                }
+                else {
+                    loadComponent("navbar-faculty", "../components/faculty_navbar.html");
+                }
+                loadComponent("footer", "../components/footer.html");
+                setTimeout(highlightActiveLink, 1000);
+
+                if (originalData.assigned_subjects.length === 0) {
+                    document.querySelector(".inRequest").style.display = "block";
+                }
+                else {
+                    document.querySelector(".inRequest").style.display = "none";
+                }
+                populateProfileForm(data);
+                loadDepartments(data.department);
+                updateSelectedSubjects();
+                const teacherCode = data.teacher_code;
+                profileHead.textContent = `Profile ( ${teacherCode} )`;
+            })
+            .catch(showError)
+            .finally(() => {
+                hideLoader();
+            });
     }
 
     function populateProfileForm(data) {
@@ -134,12 +143,12 @@ document.addEventListener("DOMContentLoaded", () => {
             working_days: profileForm.elements["working_days"].value,
             assigned_subjects: assignedSubjects,
         };
-        if(confirm("Are you sure to Submit these details?"))
+        if (confirm("Are you sure to Submit these details?"))
             submitData(updatedData);
     });
 
     function submitData(updatedData) {
-        const token = localStorage.getItem("access_token");
+        showLoader();
         fetch(`${baseUrl}/updateTeacher/${originalData.id}/`, {
             method: "PUT",
             headers: {
@@ -148,13 +157,16 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify(updatedData),
         })
-        .then(handleResponse)
-        .then(() => {
-            alert("Profile updated successfully!");
-            originalData = { ...updatedData };
-            document.location.reload();
-        })
-        .catch(showError);
+            .then(handleResponse)
+            .then(() => {
+                alert("Profile updated successfully!");
+                originalData = { ...updatedData };
+                document.location.reload();
+            })
+            .catch(showError)
+            .finally(() => {
+                hideLoader();
+            });
     }
 
     function loadDepartments(selectedDepartment) {
@@ -173,29 +185,29 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateSelectedSubjects() {
         const assignedSubjects = originalData.assigned_subjects;
         subjectList.innerHTML = "";
-    
+
         assignedSubjects.forEach((subjectObj) => {
             // Create container for each subject
-            const subject_code = Object.keys(subjectObj)[0];
-            const subject_name = subjectObj[subject_code];
+            const subject_code = subjectObj.subject_code;
+            const subject_name = subjectObj.subject_name;
 
             const subjectContainer = document.createElement("div");
             subjectContainer.classList.add("subject-card");
-    
+
             // Create div for subject code
             const codeDiv = document.createElement("div");
             codeDiv.classList.add("subject-code");
             codeDiv.textContent = subject_code;
-    
+
             // Create div for subject name
             const nameDiv = document.createElement("div");
             nameDiv.classList.add("subject-name");
             nameDiv.textContent = subject_name;
-    
+
             // Append both divs to container
             subjectContainer.appendChild(codeDiv);
             subjectContainer.appendChild(nameDiv);
-            
+
             // Append container to subject list
             subjectList.appendChild(subjectContainer);
         });
@@ -208,12 +220,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             return data;
         });
-    }    
+    }
 
     function showError(error) {
         console.error("Error: ", error);
         const errorMessage = error.message || "An error occurred.";
-    
+
         if (errorMessage.includes("401")) {
             alert("Session expired. Redirecting to login...");
             window.location.href = "../index.html";

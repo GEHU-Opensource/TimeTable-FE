@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -17,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -40,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadComponent("navbar-admin", "../components/admin_navbar.html");
     loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
+    setTimeout(highlightActiveLink, 1000);
 
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");
@@ -53,12 +57,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const timetable = document.getElementById("show");
     const fileInput = document.getElementById('tt');
     const fileChosen = document.getElementById('file-chosen');
+    const baseUrl = BE_URL;
+    const token = localStorage.getItem("access_token");
+    let mongoId = null;
 
     fileInput.addEventListener('change', () => {
         fileChosen.textContent = fileInput.files[0]?.name || "No file chosen";
     });
 
-    if(typeof departments!=='undefined') {
+    if (typeof departments !== 'undefined') {
         departments.forEach(department => {
             const option = document.createElement('option');
             option.value = department.name;
@@ -117,95 +124,153 @@ document.addEventListener("DOMContentLoaded", () => {
         populateDropdown(semesterDropdown, selectedYear?.semesters || [], "sem", "sem");
     });
 
-    allocateButton.addEventListener("click", function() {
+    allocateButton.addEventListener("click", function () {
         const data = {
             department: departmentDropdown.value,
             course: courseDropdown.value,
             branch: branchDropdown.value,
             year: yearDropdown.value,
             semester: semesterDropdown.value,
-            sections: sectionInput,
-            student_data: fileInput.files[0],
+            total_sections: sectionInput.value,
+            file: fileInput.files[0],
         };
-        if(!data.department || !data.course || !data.year || !data.semester) {
-            alert("Fill the Details!");
-            return ;
+
+        if (!data.department || !data.course || !data.branch || !data.year || !data.semester || !data.total_sections) {
+            alert("Please fill all the required fields!");
+            return;
         }
-        
-        if(!fileInput.files.length) {
+
+        if (!fileInput.files.length) {
             alert("Please select a file before submitting.");
             return;
         }
 
-        console.log("Form Data:", data);
-        alert("Updated successfully!");
-        
-        const file = generateTT; // API:departmen/course/branch/year/semester
+        const formData = new FormData();
+        formData.append("department", data.department);
+        formData.append("course", data.course);
+        formData.append("branch", data.branch);
+        formData.append("year", data.year);
+        formData.append("semester", data.semester);
+        formData.append("total_sections", data.total_sections);
+        formData.append("file", data.file);
 
-        if(typeof file !== "undefined") {
-            fetch(file, {
-                method: "GET",
-                headers: {
-                    // Add any required headers (e.g., authentication token if needed)
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok " + response.statusText);
+        showLoader();
+        fetch(`${baseUrl}/addStudentAPI/`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData
+        })
+            .then(handleResponse)
+            .then(response => {
+                const queryParams = new URLSearchParams({
+                    department: departmentDropdown.value,
+                    course: courseDropdown.value,
+                    branch: branchDropdown.value,
+                    year: yearDropdown.value
+                }).toString();
+
+                return fetch(`${baseUrl}/listSections/?${queryParams}`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
-                    return response.arrayBuffer();
-                })
-                .then((data) => {
-                    timetable.style.display = "block";
-                    const workbook = XLSX.read(data, { type: "array" });
-                    const sheetNames = workbook.SheetNames;
-                    displaySheet(workbook, sheetNames[0]);
-                })
-                .catch((error) => {
-                    alert("Failed to load the Excel file: " + error.message);
                 });
-        }
-        else {
-            alert("Excel file path is missing in data.js.");
-        }
+            })
+            .then(handleResponse)
+            .then(response => {
+                mongoId = response.mongo_id;
+                if (!mongoId) {
+                    throw new Error("No mongoId received from server");
+                }
+                return fetch(`${baseUrl}/downloadSections/${mongoId}/`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to download sections");
+                }
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'sections.xlsx';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        filename = filenameMatch[1];
+                    }
+                }
+
+                return response.blob().then(blob => ({ blob, filename }));
+            })
+            .then(({ blob, filename }) => {
+                // Display the Excel file
+                const url = URL.createObjectURL(blob);
+                return fetch(url)
+                    .then(res => res.arrayBuffer())
+                    .then(buffer => {
+                        const workbook = XLSX.read(buffer, { type: 'array' });
+                        displaySheet(workbook, workbook.SheetNames[0]);
+                        timetable.style.display = "block";
+
+                        // Store the blob for later download
+                        lastDownloadBlob = { blob, filename };
+                    });
+            })
+            .catch(showError)
+            .finally(() => {
+                hideLoader();
+            });
     });
 
     downloadButton.addEventListener('click', () => {
-        const apiEndpoint = generateTT; // Replace with your API endpoint
+        if (!lastDownloadBlob) {
+            alert("No sections allocated yet. Please allocate sections first.");
+            return;
+        }
 
-        fetch(apiEndpoint, {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok: " + response.statusText);
-            }
-            const contentDisposition = response.headers.get('Content-Disposition');
-            const filename = contentDisposition && contentDisposition.includes('filename=') ? contentDisposition.split('filename=')[1].trim().replace(/"/g, '') : 'timeTable_new.xlsx'; // Default filename if not found
-
-            return response.blob().then(blob => ({ filename, blob }));
-        })
-        .then(({ filename, blob }) => {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        })
-        .catch(error => {
-            alert("Failed to download the file: " + error.message);
-        });
+        const { blob, filename } = lastDownloadBlob;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
     });
+
+    // Add this at the top with your other variable declarations
+    let lastDownloadBlob = null;
 
     function displaySheet(workbook, sheetName) {
         const sheet = workbook.Sheets[sheetName];
         const html = XLSX.utils.sheet_to_html(sheet);
         const outputDiv = document.getElementById("output");
         outputDiv.innerHTML = html;
+    }
+
+    function handleResponse(response) {
+        return response.json().then((data) => {
+            if (!response.ok) {
+                throw new Error(data.error || data.message || `HTTP error! Status: ${response.status}`);
+            }
+            return data;
+        });
+    }
+
+    function showError(error) {
+        console.error("Error: ", error);
+        const errorMessage = error.message || "An error occurred.";
+
+        if (errorMessage.includes("401")) {
+            alert("Session expired. Redirecting to login...");
+            window.location.href = "../index.html";
+        } else {
+            alert(errorMessage);
+        }
     }
 });

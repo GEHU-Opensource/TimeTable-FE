@@ -15,6 +15,7 @@ loginForm.addEventListener("submit", async (e) => {
         return;
     }
 
+    showLoader();
     try {
         const response = await fetch(`${apiUrl}/login/`, {
             method: "POST",
@@ -48,6 +49,9 @@ loginForm.addEventListener("submit", async (e) => {
         );
         errorMessage.innerHTML = "An error occurred. Please try again later.";
     }
+    finally {
+        hideLoader();
+    }
 });
 
 function togglePassword() {
@@ -60,17 +64,20 @@ function togglePassword() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", ()=> {
+document.addEventListener("DOMContentLoaded", () => {
     localStorage.clear();
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
-                attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -91,7 +98,7 @@ document.addEventListener("DOMContentLoaded", ()=> {
             }
         });
     }
-    
+
     loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
+    setTimeout(highlightActiveLink, 1000);
 });

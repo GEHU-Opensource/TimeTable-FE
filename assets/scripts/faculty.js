@@ -12,14 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearchInput();
     setupFormSubmission();
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -29,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -51,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
+    setTimeout(highlightActiveLink, 1000);
 });
 
 function loadDepartments() {
@@ -70,6 +74,7 @@ function loadDepartments() {
 function loadSubjects() {
     dropdownContent.innerHTML = "";
 
+    showLoader();
     fetch(`${baseUrl}/getAllSubjects/`, { method: "GET" })
         .then(handleResponse)
         .then((subjects) => {
@@ -85,7 +90,10 @@ function loadSubjects() {
                 checkbox.addEventListener("change", updateSelectedSubjects);
             });
         })
-        .catch(showError);
+        .catch(showError)
+        .finally(() => {
+            hideLoader();
+        });
 }
 
 function handleResponse(response) {
@@ -193,6 +201,7 @@ function submitFormData(data) {
     // Show loading indicator
     document.getElementById("loading-spinner").style.display = "block";
 
+    showLoader();
     fetch(`${baseUrl}/addTeacher/`, {
         method: "POST",
         headers: {
@@ -227,5 +236,8 @@ function submitFormData(data) {
                 alert("Failed to submit data. Please try again.");
             }
             console.error("Error posting data:", error);
+        })
+        .finally(() => {
+            hideLoader();
         });
 }

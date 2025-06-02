@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -17,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -40,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadComponent("navbar-admin", "../components/admin_navbar.html");
     loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
+    setTimeout(highlightActiveLink, 10000);
 
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");

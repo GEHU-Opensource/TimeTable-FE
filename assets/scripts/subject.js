@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
     function loadComponent(id, file) {
+        showLoader();
         fetch(file)
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id).innerHTML = data;
                 attachNavbarEventListeners();
+            })
+            .finally(() => {
+                hideLoader();
             });
     }
-    
+
     function attachNavbarEventListeners() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
@@ -17,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    
+
     function highlightActiveLink() {
         document.getElementById("current-year").textContent = new Date().getFullYear();
         const footer = document.querySelector("footer");
@@ -38,10 +42,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-    loadComponent("navbar-admin", "../components/admin_navbar.html");
-    loadComponent("footer", "../components/footer.html");
-    setTimeout(highlightActiveLink, 100);
-    
+
+    function init() {
+        loadComponent("navbar-admin", "../components/admin_navbar.html");
+        loadComponent("footer", "../components/footer.html");
+        setTimeout(highlightActiveLink, 1000);
+    }
+    init();
+
+    const token = localStorage.getItem("access_token");
     const departmentDropdown = document.getElementById("department");
     const courseDropdown = document.getElementById("course");
     const branchDropdown = document.getElementById("branch");
@@ -150,7 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayExistingSubjects(subjects) {
         existingSubjectTableBody.innerHTML = "";
         subjects.forEach((subject) => {
-            console.log(subject);
             const row = document.createElement("tr");
             row.dataset.subjectId = subject.id;
             row.innerHTML = `
@@ -193,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const editButton = row.querySelector(".edit-btn");
             const deleteButton = row.querySelector(".delete-btn");
             const inputs = row.querySelectorAll("input, select");
-            
+
             editButton.addEventListener("click", () => {
                 const icon = editButton.querySelector("i");
                 if (icon.classList.contains("fa-edit")) {
@@ -237,9 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             is_special_subject: specialSubject,
                             is_lab: isLab,
                         };
-                        console.log(editedsubject);
                         data.subjects.push(editedsubject);
-                        const token = localStorage.getItem("access_token");
+
+                        showLoader();
                         fetch(`${baseUrl}/updateSubject/${row.dataset.subjectId}/`, {
                             method: "PUT",
                             headers: {
@@ -268,6 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             .catch((error) => {
                                 console.error("Error submitting data:", error);
                                 alert(error.message);
+                            })
+                            .finally(() => {
+                                hideLoader();
                             });
                     } else {
                         alert("Please fill all the Subject Details!");
@@ -276,12 +287,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
-    
+
             deleteButton.addEventListener("click", () => {
                 let result = confirm("Are you sure to Delete?");
                 if (result) {
                     row.remove();
-                    const token = localStorage.getItem("access_token");
+
+                    showLoader();
                     fetch(`${baseUrl}/deleteSubject/${row.dataset.subjectId}/`, {
                         method: "DELETE",
                         headers: {
@@ -298,6 +310,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         .catch((error) => {
                             console.error("Error deleting subject:", error);
                             alert("Failed to delete subject. Please try again.");
+                        })
+                        .finally(() => {
+                            hideLoader();
                         });
                 } else {
                     return;
@@ -327,7 +342,8 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Please fill in all the fields.");
             return;
         }
-        const token = localStorage.getItem("access_token");
+
+        showLoader();
         fetch(`${baseUrl}/getFilteredSubjects/filter?${params.toString()}`, {
             method: "GET",
             headers: {
@@ -342,12 +358,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 return response.json();
             })
             .then((fetchedSubjects) => {
-                console.log(fetchedSubjects);
                 displayExistingSubjects(fetchedSubjects);
             })
             .catch((error) => {
                 console.error("Error: ", error);
                 alert(error);
+            })
+            .finally(() => {
+                hideLoader();
             });
 
         const subjectDatas = document.getElementById("subjectData");
@@ -444,13 +462,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         is_lab: isLab,
                     };
                     data.push(subject);
-                    console.log("submittedData",subject);
                 } else {
                     allFieldsFilled = false;
                 }
             }
         });
-        console.log(data);
 
         if (!allFieldsFilled) {
             alert("Please fill in all subject details.");
@@ -458,7 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (data.length > 0) {
-            const token = localStorage.getItem("access_token");
+            showLoader();
             fetch(`${baseUrl}/addSubject/`, {
                 method: "POST",
                 headers: {
@@ -502,6 +518,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 .catch((error) => {
                     console.error("Error adding subjects:", error);
                     alert(error.message || "Failed to add subjects. Please try again.");
+                })
+                .finally(() => {
+                    hideLoader();
                 });
         } else {
             alert("No subjects to submit.");
