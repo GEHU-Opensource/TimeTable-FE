@@ -41,7 +41,7 @@ h2 {
     outline: none;
     background-color: #f9fff9;
     border-color: #28a745;
-    box-shadow: 0 0 5px rgba(40,167,69,0.8);
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.8);
 }
 
 #noRoomsMessage {
@@ -68,7 +68,8 @@ table {
 
 }
 
-table th, table td {
+table th,
+table td {
     padding: 10px;
     text-align: center;
     border: 1px solid #ddd;
@@ -79,19 +80,23 @@ table th {
     font-weight: bold;
 }
 
-table input, table select {
+table input,
+table select {
     width: 90%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-table input:disabled, table select:disabled {
+table input:disabled,
+table select:disabled {
     background-color: #f1f1f1;
     cursor: not-allowed;
 }
 
-.action-section button, .edit-btn, .delete-btn {
+.action-section button,
+.edit-btn,
+.delete-btn {
     margin: 5px;
     padding: 10px 15px;
     border: none;
@@ -100,9 +105,11 @@ table input:disabled, table select:disabled {
     cursor: pointer;
 }
 
-input[type="text"]:focus, input[type="number"]:focus, select:focus {
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
     border-color: #28a745;
-    box-shadow: 0 0 5px rgba(40,167,69,0.8);
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.8);
     outline: none;
     background-color: #f9fff9;
 }
@@ -117,7 +124,8 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
     font-weight: bold;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
     background: none;
     border: none;
     font-size: 1.2em;

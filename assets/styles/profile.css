@@ -70,7 +70,8 @@ h3 i {
     margin-bottom: 30px;
 }
 
-.personal-info, .professional-info {
+.personal-info,
+.professional-info {
     flex: 1;
     padding: 20px;
     background-color: #f9f9f9;
@@ -109,7 +110,7 @@ select:focus {
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     margin: 30px 0;
 }
 
@@ -123,7 +124,7 @@ select:focus {
     background-color: #fff;
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     border-left: 4px solid #28a745;
 }
 
@@ -174,4 +175,3 @@ button[disabled] {
 button[disabled]:hover {
     background-color: #ccc;
 }
-

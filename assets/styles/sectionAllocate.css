@@ -18,7 +18,7 @@ main {
     background-color: #fff;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     width: 100%;
 }
@@ -40,7 +40,8 @@ h2 {
     color: #555;
 }
 
-.form-group input, select {
+.form-group input,
+select {
     width: 100%;
     padding: 10px;
     font-size: 14px;
@@ -66,9 +67,10 @@ h2 {
     background-color: #218838;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     border-color: #28a745;
-    box-shadow: 0 0 5px rgba(40,167,69,0.8);
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.8);
     outline: none;
     background-color: #f9fff9;
 }
@@ -129,7 +131,8 @@ table {
     margin: 20px;
 }
 
-th, td {
+th,
+td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -168,7 +171,8 @@ th {
     border-collapse: collapse;
 }
 
-#output th, #output td {
+#output th,
+#output td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
