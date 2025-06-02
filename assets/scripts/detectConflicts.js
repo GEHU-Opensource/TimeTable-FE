@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             showMessage("Network error. Please try again.", "error");
         } finally {
-            hdieLoader();
+            hideLoader();
         }
     });
 
