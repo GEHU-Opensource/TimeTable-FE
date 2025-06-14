@@ -1232,3 +1232,36 @@ const showLoader = () => {
 const hideLoader = () => {
     document.getElementById('loader').style.display = 'none';
 };
+
+document.addEventListener('contextmenu', (event) => (event.preventDefault()));
+document.addEventListener("keydown", function (e) {
+    // Block F12
+    if (e.key === "F12" || e.keyCode === 123) {
+      e.preventDefault();
+      return false;
+    }
+
+    // Block Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
+      e.preventDefault();
+      return false;
+    }
+
+    // Block Ctrl+Shift+J
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "j") {
+      e.preventDefault();
+      return false;
+    }
+
+    // Block Ctrl+U
+    if (e.ctrlKey && e.key.toLowerCase() === "u") {
+      e.preventDefault();
+      return false;
+    }
+
+    // Block Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
+      e.preventDefault();
+      return false;
+    }
+  });
