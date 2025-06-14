@@ -96,8 +96,9 @@
 
     <main>
         <h2>Teacher Management</h2>
-        <div class="search-container">
+        <div class="external-container">
             <input type="text" id="teacherSearch" placeholder="Search teachers...">
+            <button id="inviteTeacherBtn"><i class="fas fa-user-plus"></i> Invite</button>
         </div>
         <div id="noTeachersMessage">No teachers found.</div>
         <table id="teachersTable">
@@ -135,6 +136,32 @@
                 </select>
                 <button id="saveTypeBtn"><i class="fas fa-save"></i> Save</button>
                 <button id="cancelEditBtn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Teacher Modal -->
+    <div id="inviteTeacherModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Invite Teachers</h2>
+            
+            <div class="invite-form">
+                <div id="emailFieldsContainer">
+                    <div class="email-field-group">
+                        <input type="email" class="teacher-email" placeholder="Enter teacher's email" required>
+                        <button class="remove-email-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                
+                <button id="addMoreEmailsBtn" class="add-more-btn">
+                    <i class="fas fa-plus"></i> Add Another Email
+                </button>
+                
+                <div class="action-buttons">
+                    <button id="sendInvitesBtn" class="send-btn"><i class="fas fa-paper-plane"></i> Send Invitations</button>
+                    <button id="cancelInviteBtn" class="cancel-btn"><i class="fas fa-times"></i> Cancel</button>
+                </div>
             </div>
         </div>
     </div>
