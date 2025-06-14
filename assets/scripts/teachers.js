@@ -62,6 +62,13 @@ const teacherTypeSelect = document.getElementById("teacherTypeSelect");
 const saveTypeBtn = document.getElementById("saveTypeBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 const closeModal = document.querySelector(".close");
+const inviteTeacherBtn = document.getElementById("inviteTeacherBtn");
+const inviteTeacherModal = document.getElementById("inviteTeacherModal");
+const emailFieldsContainer = document.getElementById("emailFieldsContainer");
+const addMoreEmailsBtn = document.getElementById("addMoreEmailsBtn");
+const sendInvitesBtn = document.getElementById("sendInvitesBtn");
+const cancelInviteBtn = document.getElementById("cancelInviteBtn");
+const closeInviteModal = document.querySelector("#inviteTeacherModal .close");
 
 const baseUrl = BE_URL;
 const token = localStorage.getItem("access_token");
@@ -298,6 +305,11 @@ function saveTeacherType() {
 // Add these event listeners in your setupEventListeners function
 function setupEventListeners() {
     teacherSearch.addEventListener("input", filterTeachers);
+    saveTypeBtn.addEventListener("click", saveTeacherType);
+    cancelEditBtn.addEventListener(
+        "click",
+        () => (teacherDetailsModal.style.display = "none")
+    );
     closeModal.addEventListener(
         "click",
         () => (teacherDetailsModal.style.display = "none")
@@ -307,10 +319,113 @@ function setupEventListeners() {
             teacherDetailsModal.style.display = "none";
     });
 
-    // Add these new event listeners
-    saveTypeBtn.addEventListener("click", saveTeacherType);
-    cancelEditBtn.addEventListener(
-        "click",
-        () => (teacherDetailsModal.style.display = "none")
+    inviteTeacherBtn.addEventListener("click", openInviteTeacherModal);
+    addMoreEmailsBtn.addEventListener("click", addEmailField);
+    emailFieldsContainer.addEventListener("click", handleEmailFieldActions);
+    sendInvitesBtn.addEventListener("click", sendInvitations);
+    cancelInviteBtn.addEventListener("click",
+        () => (inviteTeacherModal.style.display = 'none')
     );
+    closeInviteModal.addEventListener("click",
+        () => (inviteTeacherModal.style.display = 'none')
+    );
+    window.addEventListener("click", (e) => {
+        if (e.target === inviteTeacherModal) {
+            inviteTeacherModal.style.display = 'none';
+        }
+    });
+}
+
+// Add these new functions
+function openInviteTeacherModal() {
+    inviteTeacherModal.style.display = 'block';
+    // Reset form when opening
+    emailFieldsContainer.innerHTML = `
+        <div class="email-field-group">
+            <input type="email" class="teacher-email" placeholder="Enter teacher's email" required>
+            <button class="remove-email-btn" style="display: none;"><i class="fas fa-times"></i></button>
+        </div>
+    `;
+}
+
+function addEmailField() {
+    const emailFieldGroup = document.createElement('div');
+    emailFieldGroup.className = 'email-field-group';
+    emailFieldGroup.innerHTML = `
+        <input type="email" class="teacher-email" placeholder="Enter teacher's email">
+        <button class="remove-email-btn"><i class="fas fa-times"></i></button>
+    `;
+    emailFieldsContainer.appendChild(emailFieldGroup);
+    
+    // Show remove buttons for all fields except the first one
+    const removeButtons = document.querySelectorAll('.remove-email-btn');
+    if (removeButtons.length > 1) {
+        removeButtons.forEach(btn => btn.style.display = 'block');
+    }
+}
+
+function handleEmailFieldActions(e) {
+    if (e.target.classList.contains('remove-email-btn') || 
+        e.target.parentElement.classList.contains('remove-email-btn')) {
+        const emailGroup = e.target.closest('.email-field-group');
+        if (emailGroup && document.querySelectorAll('.email-field-group').length > 1) {
+            emailGroup.remove();
+        }
+        
+        // Hide remove button if only one field remains
+        const removeButtons = document.querySelectorAll('.remove-email-btn');
+        if (removeButtons.length === 1) {
+            removeButtons[0].style.display = 'none';
+        }
+    }
+}
+
+function sendInvitations() {
+    const emailInputs = document.querySelectorAll('.teacher-email');
+    const emails = [];
+    let isValid = true;
+    
+    // Checking Validity
+    emailInputs.forEach(input => {
+        if (!input.value || !input.checkValidity()) {
+            input.style.borderColor = '#dc3545';
+            isValid = false;
+        } else {
+            input.style.borderColor = '#ddd';
+            emails.push(input.value);
+        }
+    });
+    
+    if (!isValid || emails.length === 0) {
+        alert('Please enter valid email addresses');
+        return;
+    }
+    
+    const requestData = {emails: emails};
+
+    showLoader();
+    fetch(`${baseUrl}/inviteTeachers/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('Invitations sent successfully!');
+        window.location.reload();
+    })
+    .catch(error => {
+        showError(error);
+    })
+    .finally(() => {
+        hideLoader();
+    });
 }
